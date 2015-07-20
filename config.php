@@ -7,16 +7,17 @@ $___config->setData(array(
     'design' => array(
         'skin' => 'default',
         'core' => array(
-            'template' => array(
-                'path' => 'app'.DS.'core'.DS.'design'.DS.'%skin%'.DS.'template'.DS,
-            )
+            'skin' => array(
+                'path' => 'app'.DS.'core'.DS.'design'.DS.'%skin%'.DS,
+            ),
         ),
         'mod' => array(
-            'template' => array(
-                'path' => 'app'.DS.'mod'.DS.'%mod%'.DS.'design'.DS.'%skin%'.DS.'template'.DS,
-            )
+            'skin' => array(
+                'path' => 'app'.DS.'mod'.DS.'%mod%'.DS.'design'.DS.'%skin%'.DS,
+            ),
         )
     ),
+
     'pdo' => array(
         'adapter' => 'mysql',
         'config'  => array(
@@ -28,5 +29,13 @@ $___config->setData(array(
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
             )
         )
+    ),
+
+    'url' => array(
+        'base' => 'http://gis.local/'
+    ),
+
+    'dir' => array(
+        'base' => __DIR__,
     ),
 ));

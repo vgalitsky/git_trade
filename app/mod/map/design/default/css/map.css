@@ -1,0 +1,29 @@
+html, body, #map-canvas {
+    height: 100%;
+    margin: 0px;
+    padding: 0px
+}
+
+table.grid>tbody>tr:hover{
+    background-color: lightcyan;
+}
+table.grid>thead{
+    background-color: lightcyan;
+}
+.marker-content .info-table td:nth-child(2){
+    font-weight: bold;
+}
+.marker-content{
+    /*width:400px;*/
+    /*height:300px;*/
+}
+
+.marker-content h1{
+    font-size:12px;
+}
+label[for]{
+    cursor:pointer;
+}
+.hidden{
+    display:none;
+}

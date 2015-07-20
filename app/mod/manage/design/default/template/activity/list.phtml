@@ -1,0 +1,142 @@
+<style>
+    #add-dialog-activity{
+        display:none;
+    }
+    #add-dialog-activity-content{
+        text-align: center;
+    }
+</style>
+<div id="activity-grid-container">
+    <div id="activity-grid-container-content">
+        <img src="<?php echo self::getSkinUrl('images/progress-bar.gif') ?>"/>
+    </div>
+</div>
+<div id="add-dialog-activity">
+    <div id="add-dialog-activity-content">
+        <img src="<?php echo self::getSkinUrl('images/progress-bar.gif') ?>"/>
+    </div>
+</div>
+<button class="button" id="add-activity" url="<?php echo $this->getUrl('manage/activity/add_form') ?>">Добавить</button>
+<script>
+
+    progressBar = '<img src="<?php echo self::getSkinUrl("images/progress-bar.gif") ?>"/>';
+    activityManager = {
+        updateList: function(){
+            $('#activity-grid-container-content').html(progressBar);
+            $.ajax({
+               type: 'POST',
+               url: '<?php echo $this->getUrl('manage/activity/grid') ?>',
+               complete: function(response){
+                   $('#activity-grid-container-content').html(response.responseText);
+               }
+
+            });
+        },
+        saveactivity: function(){
+            var data = $('#add-activity-form').serialize();
+            $('#add-dialog-activity-content').html(progressBar);
+            $.ajax({
+                type: 'POST',
+                url: '<?php echo $this->getUrl('manage/activity/save') ?>',
+                data: data,
+                complete: function(response){
+                    $('#add-dialog-activity-content').html(response.responseText);
+                    $('#add-dialog-activity').dialog({
+                        modal: true,
+                        width: 400,
+                        buttons: [
+                            {
+                                text: "Закрыть",
+                                click: function() {
+                                    $( this ).dialog( "close" );
+                                    activityManager.updateList();
+                                }
+                            }
+                        ]
+                    });
+                }
+            });
+        },
+        getForm: function( activity_id ){
+            $('#add-dialog-activity-content').html(progressBar);
+            $('#add-dialog-activity').dialog({
+                modal: true,
+                width: 400,
+                buttons: [
+                    {
+                        text: "Сохранить",
+                        click: function() {
+                            activityManager.saveactivity();
+                        }
+                    },
+                    {
+                        text: "Отмена",
+                        click: function() {
+                            $( this ).dialog( "close" );
+                        }
+                    }
+                ]
+            });
+            $.ajax({
+                type: 'POST',
+                url: $('#add-activity').attr('url'),
+                data:{
+                    activity_id: activity_id
+                },
+                complete: function(response){
+                    $('#add-dialog-activity-content').html(response.responseText);
+                }
+            });
+        },
+
+        deleteactivity: function(activity_id){
+            $('#add-dialog-activity-content').html('Удалить?');
+            $('#add-dialog-activity').dialog({
+                modal: true,
+                width: 400,
+                buttons: [
+                    {
+                        text: "Удалить",
+                        click: function() {
+                            var dialog=this;
+                            $.ajax({
+                                type: 'POST',
+                                url: '<?php echo $this->getUrl('manage/activity/delete')?>',
+                                data: {activity_id: activity_id},
+                                complete: function(response){
+                                    $('#add-dialog-activity-content').html(response.responseText);
+                                    $( dialog ).dialog( {
+                                        buttons:[{
+                                            text: "Закрыть",
+                                            click: function() {
+                                                $( this ).dialog( "close" );
+                                                $('tr[activity_id='+activity_id+']').animate({opacity:0},'slow',function(){
+                                                    $(this).remove();
+                                                });
+                                            }
+                                        }]
+                                    } );
+                                }
+                            });
+                        }
+                    },
+                    {
+                        text: "Отмена",
+                        click: function() {
+                            $( this ).dialog( "close" );
+                        }
+                    }
+                ]
+            });
+        }
+    };
+
+    (function($){
+
+        activityManager.updateList();
+        $('#add-activity').click(function(){
+            activityManager.getForm();
+        });
+
+    })(jQuery)
+</script>

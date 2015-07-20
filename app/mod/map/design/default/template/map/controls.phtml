@@ -1,0 +1,277 @@
+<?php
+$filter = $this->getVar('filter');
+/** @var core_model_user $luser */
+$luser = app::getSession()->getLoggedInUser();
+?>
+<style>
+    #controls {
+        position: absolute;
+        top: 10px;
+        left: 20px;
+        z-index: 99;
+        /*background-color: #fff;*/
+        padding: 10px;
+        height: 300px;
+        width: 350px;
+        opacity: 0.8;
+        /*border:1px solid #ccc;*/
+        display: none;
+    }
+</style>
+<div id="controls">
+
+    <div id="controls-tabs" class="tabs">
+
+        <ul style="font-size:10px;">
+            <li><a href="#tab-date">Период</a></li>
+            <li><a href="#tab-activity">Активности</a></li>
+            <li><a href="#tab-city">Города</a></li>
+            <li><a href="#tab-traders">Агенты</a></li>
+            <li><a href="#tab-settings" title="Настройки"><img height="10px"
+                                                               src="<?php echo $this->getSkinUrl('img/user_info.png') ?>"/></a>
+            </li>
+        </ul>
+        <form id="controls-form" onsubmit="return false;">
+            <div id="tab-date">
+                <p>От: <input type="text" name="filter[date][from]"
+                              value="<?php echo date('d.m.Y', $filter['date']['from']) ?>" class="datepicker"></p>
+
+                <p>До: <input type="text" name="filter[date][to]"
+                              value="<?php echo date('d.m.Y', $filter['date']['to']) ?>" class="datepicker"></p>
+
+                <div class="ui-buttonset">
+                    <button class="button" onclick="gisTrade.init();"><span>Применить</span></button>
+                </div>
+            </div>
+            <div id="tab-activity">
+                <a href="javascript:void(0);" class="right check-all-filters"
+                   selector="'input.marker-field-filter[field=activity_id]'">Выбрать все</a>
+                <table>
+                    <?php foreach ($this->getVar('activities') as $activity): ?>
+                        <tr>
+                            <td>
+                                <input type="checkbox" checked field="activity_id"
+                                       field_value="<?php echo $activity->getId() ?>" class="marker-field-filter"
+                                       name="filter[activity][<?php echo $activity->getId() ?>]"
+                                       id="activity_<?php echo $activity->getId() ?>"
+                                    />
+                            </td>
+                            <td>
+                                <label
+                                    for="activity_<?php echo $activity->getId() ?>"><?php echo $activity->getData('name') ?></label>
+                            </td>
+
+                        </tr>
+                    <?php endforeach ?>
+                </table>
+            </div>
+            <div id="tab-city">
+                <a href="javascript:void(0);" class="right check-all-filters"
+                   selector="'input.marker-field-filter[field=city_id]'">Выбрать все</a>
+                <table>
+
+                    <?php foreach ($this->getVar('cities') as $city): ?>
+                        <tr>
+                            <td>
+                                <input type="checkbox" checked field="city_id"
+                                       field_value="<?php echo $city->getId() ?>" class="marker-field-filter"
+                                       name="filter[city][<?php echo $city->getId() ?>]"
+                                       id="city_<?php echo $city->getId() ?>"/>
+                            </td>
+                            <td>
+                                <label
+                                    for="city_<?php echo $city->getId() ?>"><?php echo $city->getData('name') ?></label>
+                            </td>
+
+                        </tr>
+                    <?php endforeach ?>
+                </table>
+            </div>
+            <div id="tab-traders">
+                <a href="javascript:void(0);" class="right check-all-filters"
+                   selector="'input.marker-field-filter[field=user_id]'">Выбрать все</a>
+                <table>
+
+                    <?php
+
+                    foreach ($this->getVar('traders') as $trader): ?>
+                        <?php
+                        $hc='';
+                        $checked = 'checked';
+                        if($luser->getData('role_id')!=manage_model_role::ROLE_ADMIN):?>
+                            <?php if($trader->getData('parent_id') != $luser->getId()):
+                                $hc = 'hidden';
+                                $checked = '';
+                            endif;?>
+                        <?php endif ?>
+
+                        <tr class="<?php echo $hc;?>">
+                            <td>
+
+                                <input
+
+                                    <?php echo $checked ?>
+                                    type="checkbox" trader_id="<?php echo $trader->getId() ?>"
+                                       field="user_id" field_value="<?php echo $trader->getId() ?>"
+                                       class="marker-field-filter "
+                                       name="filter[trader][<?php echo $trader->getId() ?>]"
+                                       id="user_<?php echo $trader->getId() ?>"
+                                    />
+                            </td>
+                            <td>
+                                <label for="user_<?php echo $trader->getId() ?>">
+                                    <?php echo $trader->getData('fullname') ?>
+                                </label>
+                            </td>
+
+                        </tr>
+                    <?php endforeach ?>
+                </table>
+            </div>
+        </form>
+        <div id="tab-settings">
+            <form id="user_info_form" onsubmit="return false">
+
+                <input type="hidden" name="user[user_id]" value="<?php echo $luser->getId() ?>"/>
+                <table>
+                    <tr>
+                        <td>Имя</td>
+                        <td><input type="text" name="user[fullname]" value="<?php echo $luser->getData('fullname') ?>"></td>
+                    </tr>
+                    <tr>
+                        <td>Телефон</td>
+                        <td><input type="text" name="user[phone]" value="<?php echo $luser->getData('phone') ?>"></td>
+                    </tr>
+                    <tr>
+                        <td>Email</td>
+                        <td><input type="text" name="user[username]" value="<?php echo $luser->getData('username') ?>"></td>
+                    </tr>
+                    <tr>
+                        <td>Пароль</td>
+                        <td>
+                            <a href="javascript:void(0);" onclick="$('#user_change_password').fadeToggle()">Изменить пароль</a>
+                            <table id="user_change_password" style="display:none">
+                                <tr>
+                                    <td>Новый пароль</td>
+                                    <td><input type="password" name="user[password]"></td>
+                                </tr>
+                                <tr>
+                                    <td>Еще раз</td>
+                                    <td><input type="password" name="user[password_repeat]"></td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+                <button class="ui-button">Сохранить</button>
+
+            </form>
+        </div>
+    </div>
+
+
+</div>
+
+<style>
+    #manage-toolbar {
+        position: absolute;
+        top: 0px;
+        left: 45%;
+        background-color: #fff;
+        z-index: 99;
+        padding: 5px;
+        border-bottom-left-radius: 4px;
+        border-bottom-right-radius: 4px;
+        border: 1px solid #ccc;
+        opacity: 0.8;
+    }
+
+    #manage-dialog {
+        display: none;
+    }
+</style>
+<div id="manage-toolbar">
+    <?php if($luser->getData('role_id')== manage_model_role::ROLE_ADMIN) : ?>
+    <a id="manage" href="#manage">Администрирование</a>
+    <?php endif; ?>
+    <a  href="<?php echo $this->getUrl('map/index/logout')?>">Выход</a>
+</div>
+<div id="manage-dialog">
+    <div id="manage-dialog-content">
+        content
+    </div>
+</div>
+<script>
+    $(function () {
+        $('#controls').show();
+
+        progressBar = '<img src="<?php echo self::getSkinUrl("images/progress-bar.gif", 'manage') ?>"/>';
+        $('#manage').click(function () {
+            $('#manage-dialog-content').html(progressBar);
+            $('#manage-dialog').dialog({
+                title: 'Управление',
+                modal: true,
+                width: 800,
+                height: 600,
+                buttons: [
+                    {
+                        text: "Закрыть",
+                        click: function () {
+                            $(this).dialog("close");
+                        }
+                    }
+                ]
+            });
+            $("#manage-dialog .ui-dialog-titlebar").hide();
+            $.ajax({
+                url: "<?php echo $this->getUrl('manage/index/ajaxindex') ?> ",
+                dataType: 'text',
+                complete: function (response) {
+                    $('#manage-dialog-content').html(response.responseText);
+
+                }
+            })
+        });
+
+        $('#user_info_form').on('submit',function(){
+            $.ajax({
+                url: '<?php echo $this->getUrl('manage/user/save') ?>',
+                type: 'POST',
+                data: $('#user_info_form').serialize(),
+                complete: function(response){
+                    if(response.responseText){
+                        $('#manage-dialog-content').html(response.responseText);
+                        $('#manage-dialog').dialog({
+                            title: 'Управление',
+                            modal: true,
+                            width: 300,
+                            height: 200,
+                            buttons: [
+                                {
+                                    text: "Закрыть",
+                                    click: function () {
+                                        $(this).dialog("close");
+                                    }
+                                }
+                            ]
+                        });
+
+                    }
+                    else{
+                        alert('OK');
+                    }
+                }
+            });
+        })
+
+        $('input.marker-field-filter').on('click', function () {
+            gisTrade.filterMarkers();
+        });
+
+        $('.check-all-filters').on('click', function () {
+            $($(this).attr('selector')).prop('checked', true);
+            gisTrade.filterMarkers();
+        });
+
+    });
+</script>

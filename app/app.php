@@ -31,6 +31,15 @@ class app{
     }
 
     /**
+     * @return core_session
+     */
+    static function getSession(){
+        return self::$_request->getSession();
+    }
+
+
+
+    /**
      * @return PDO
      */
     static function getConnection(){
@@ -82,6 +91,22 @@ class app{
         $model->setConnection( self::getConnection() );
         return $model;
     }
+
+    static function getBaseDir(){
+        return self::getConfig('dir/base');
+    }
+
+    /**
+     * @return core_config|null
+     */
+    static function getBaseUrl(){
+        return self::getConfig('url/base');
+    }
+
+    static function getUrl( $url ){
+        return self::getBaseUrl().$url;
+    }
+
 
 
 

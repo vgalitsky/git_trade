@@ -1,3 +1,10 @@
-    <head>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <?php if(is_array($this->getCss())) foreach ($this->getCss() as $css): ?>
+        <link rel="stylesheet" type="text/css" href="<?php echo self::getSkinUrl($css['item'], $css['mod']) ?>" media="all"/>
+    <?php endforeach; ?>
+    <?php if(is_array($this->getJs()))foreach ($this->getJs() as $js): ?>
+        <script type="text/javascript" src="<?php echo self::getSkinUrl($js['item'],$js['mod']) ?>"></script>
+    <?php endforeach; ?>
 
-    </head>
+</head>

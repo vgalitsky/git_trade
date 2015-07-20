@@ -1,0 +1,41 @@
+<?php
+/** @var map_block_map_marker_content $this */
+/** @var manage_model_event $event */
+$event = $this->getVar('event');
+?>
+<div class="marker-content">
+    <h1><?php echo $event->getData('title') ?></h1>
+
+    <div id="marker-tabs" class="tabs">
+
+        <ul style="font-size:10px;">
+            <li><a href="#tab-image">Изображение</a></li>
+            <li><a href="#tab-data">Данные</a></li>
+        </ul>
+        <div id="tab-image" class="tab">
+            <img width="370px" src="<?php echo app::getUrl('sd/event/event.jpg') ?>"/>
+        </div>
+        <div id="tab-data" class="marker-data tab" >
+            <table class="info-table">
+                <tr>
+                    <td>Дата, время</td>
+                    <td><?php echo date('d.m.Y H:i', $event->getData('date')) ?></td>
+                </tr>
+                <tr>
+                    <td>Агент</td>
+                    <td><?php echo $event->getData('user_fullname') ?></td>
+                </tr>
+                <tr>
+                    <td>Город</td>
+                    <td><?php echo $event->getData('city_name') ?></td>
+                </tr>
+                <tr>
+                    <td>Активность</td>
+                    <td><?php echo $event->getData('activity_name') ?></td>
+                </tr>
+            </table>
+        </div>
+
+    </div>
+
+</div>

@@ -1,0 +1,120 @@
+<?php /** @var manage_block_user_grid $this*/?>
+<?php
+$collection = $this->getVar('collection');
+
+/** @var manage_model_user $managers */
+$managers = $this->getVar('managers');
+?>
+
+<table id="user-grid" class="grid" cellspacing="0" cellpadding="0" width="100%" style="overflow:scroll">
+    <thead>
+        <tr style="text-align:left;">
+            <th width="15%">Имя</th>
+            <th width="12%">Роль</th>
+            <th width="12%">Телефон</th>
+            <th width="15%">Email</th>
+            <th width="15%">Менеджер</th>
+            <th width="10%">Статистика</th>
+            <th width="90%"></th>
+        </tr>
+        <tr id="user-grid-filter">
+            <td><input type="text" class="filter-grid-js-control" filtered="u-f-fullname" size="18"/></td>
+            <td>
+                <select class="filter-grid-js-control" filtered="u-f-role_name">
+                    <option value=""></option>
+                    <option value="Агент">Агент</option>
+                    <option value="Менеджер">Менеджер</option>
+                    <option value="Администратор">Администратор</option>
+                </select>
+            </td>
+            <td><input type="text" class="filter-grid-js-control" filtered="u-f-phone" size="12"/></td>
+            <td><input type="text" class="filter-grid-js-control" filtered="u-f-email" size="14"/></td>
+
+            <td>
+                <select class="filter-grid-js-control" filtered="u-f-parent_fullname">
+                    <option value=""></option>
+                    <?php foreach($managers as $manager):?>
+                        <option value="<?php echo $manager->getData('fullname') ?>"><?php echo $manager->getData('fullname') ?></option>
+                    <?php endforeach;?>
+                </select>
+                <br/>
+                <input type="text" class="filter-grid-js-control" filtered="u-f-parent_fullname" size="14"/>
+            </td>
+            <td></td>
+            <td></td>
+        </tr>
+    </thead>
+    <tbody >
+<?php foreach($this->getVar('collection') as $user): ?>
+    <tr user_id="<?php echo $user->getId()?>">
+        <td class="u-f-fullname"><?php echo $user->getData('fullname')?></td>
+        <td class="u-f-role_name"><?php echo $user->getData('role_name')?></td>
+        <td class="u-f-phone"><a href="callto:<?php echo $user->getData('phone')?>"><?php echo $user->getData('phone')?></a></td>
+        <td class="u-f-email"><?php echo $user->getData('username')?></td>
+        <td class="u-f-parent_fullname"><?php echo $user->getData('parent_fullname')?></td>
+        <td class="u-f-activity_count"><?php echo $user->getData('activity_count')?></td>
+        <td >
+            <ul id="icons" class="ui-widget ui-helper-clearfix right">
+                <li onclick="userManager.filterMap(<?php echo $user->getId()?>)" class="ui-state-default ui-corner-all" title="Фильтровать события для этого пользователя на карте"><span class="ui-icon ui-icon-search"></span></li>
+                <li onclick="userManager.getForm(<?php echo $user->getId()?>)" class="ui-state-default ui-corner-all" title="Изменить"><span class="ui-icon ui-icon-pencil"></span></li>
+                <li onclick="userManager.deleteuser(<?php echo $user->getId()?>)" user_id="<?php echo $user->getId()?>" class="user-grid-delete ui-state-default ui-corner-all" title="Удалить"><span class="ui-icon ui-icon-trash"></span></li>
+             </ul>
+        </td>
+    </tr>
+<?php endforeach?>
+    </tbody>
+</table>
+<script>
+    (function($){
+
+        g_filter = function(){
+            $('#user-grid>tbody>tr').show();
+            $('#user-grid-filter .filter-grid-js-control').each(function(){
+                var filter_control = this;
+                var table = $(filter_control).closest('table');
+                var tbody = $(table).find('tbody');
+                var filtered = $(filter_control).attr('filtered');
+                $(tbody).find('tr>td.'+filtered).each(function(){
+                    if($(this).html().search(new RegExp($(filter_control).val(),'i'))==-1){
+                        $(this).closest('tr').hide();
+                    }else{
+                       // $(this).closest('tr').show();
+                    }
+                })
+            })
+        };
+
+        grid_filter = function(el){
+            if($(el).val()===''){
+
+            };
+            //var td = $(el).attr('td');
+            var table = $(el).closest('table');
+            var tbody = $(table).find('tbody');
+            $(tbody).find('tr>td:nth-child('+td+')').each(function(){
+                var show = true;
+                var that = this;
+                $('#user-grid-filter .filter-grid-js-control').each(function(){
+                    var re = new RegExp( $(this).val() );
+                    if($(that).html().search(new RegExp($(this).val(),'i'))==-1){
+                        show = false;
+                        return false;
+                    }
+                });
+                if(show){
+                    $(that).closest('tr').show();
+                }else{
+                    $(that).closest('tr').hide();
+                }
+
+            });
+        }
+        $('.filter-grid-js-control').on('keyup',function(){
+            g_filter();
+        });
+        $('.filter-grid-js-control').on('change',function(){
+            g_filter();
+
+        });
+    })(jQuery);
+</script>

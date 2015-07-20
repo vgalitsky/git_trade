@@ -3,7 +3,7 @@ class core_autoload {
 
     static $_BASE_CODE_PATH = 'app';
     static $_CORE_PATH = 'core';
-    static $_MOD_PATH = 'mod';
+    static $_MOD_PATH = 'app/mod';//@TODO true relative
 
     public function __construct(){
     }
@@ -38,7 +38,7 @@ class core_autoload {
      */
     static function mod_autoload( $class_name, $type = '' ){
         $path = preg_replace('/'.CS.'/','/', $class_name);
-        $path = self::$_BASE_CODE_PATH . DS. self::$_MOD_PATH .DS. ($type ? ($type .DS) : '') . $path . '.php';
+        $path = self::$_MOD_PATH .DS. ($type ? ($type .DS) : '') . $path . '.php';
         if(file_exists($path)){
             include_once($path);
             return true;

@@ -1,0 +1,240 @@
+<?php echo  $this->renderChildHtml('toolbar')?>
+<?php echo  $this->renderChildHtml('controls')?>
+<div id="map-canvas"></div>
+<script>
+
+    function initialize() {
+        var mapOptions = {
+            zoom: 9,
+            mapTypeControl: true,
+            zoomControl: true,
+            zoomControlOptions: {
+                position: google.maps.ControlPosition.RIGHT_CENTER
+            },
+            panControl: true,
+            panControlOptions: {
+                position: google.maps.ControlPosition.RIGHT_CENTER
+            },
+        };
+        gisTrade.map = new google.maps.Map(document.getElementById('map-canvas'),
+            mapOptions);
+
+        // Try HTML5 geolocation
+        if(navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function(position) {
+                gisTrade.currentPos = new google.maps.LatLng(position.coords.latitude,
+                    position.coords.longitude);
+
+                gisTrade.map.setCenter(gisTrade.currentPos);
+            }, function() {
+                handleNoGeolocation(true);
+            });
+        } else {
+            // Browser doesn't support Geolocation
+            handleNoGeolocation(false);
+        }
+
+        gisTrade.init();
+    }
+
+    function handleNoGeolocation(errorFlag) {
+        if (errorFlag) {
+            var content = 'Error: The Geolocation service failed.';
+        } else {
+            var content = 'Error: Your browser doesn\'t support geolocation.';
+        }
+
+        var options = {
+            map: gisTrade.map,
+            position: new google.maps.LatLng(50, 28),
+            content: content
+        };
+
+        var infowindow = new google.maps.InfoWindow(options);
+        gisTrade.map.setCenter(options.position);
+    }
+
+    function loadScript() {
+        var script = document.createElement('script');
+        script.type = 'text/javascript';
+        script.src = 'https://maps.googleapis.com/maps/api/js?v=3.exp' +
+            '&callback=initialize&language=ru';
+        document.body.appendChild(script);
+    }
+
+    window.onload = loadScript;
+
+
+    gisTrade = {
+        map: null,
+        activityMarkers: [],
+        activityMarkersCluster: null,
+        currentPos: 0,
+        init: function () {
+            gisTrade.showActivityMarkers(false);
+            gisTrade.activityMarkers = [];
+            gisTrade.activityMarkersCluster = null;
+
+            gisTrade.getAllEvents();
+
+
+           /* google.maps.event.addListener(gisTrade.activityMarkersCluster, "mouseover", function (mCluster) {
+                var infowindow = new google.maps.InfoWindow({
+                    content: 'aaaaa'
+                });
+                //infowindow.setPosition(mCluster.getCenter());
+                infowindow.open(gisTrade.map, gisTrade.activityMarkers[0]);
+            });*/
+
+
+            gisTrade.showActivityMarkers(true);
+        },
+        addActivityMarker: function (markerData) {
+            var marker = new google.maps.Marker({
+                position: markerData.LatLng,
+                map: gisTrade.map,
+                title: markerData.title,
+                //animation: google.maps.Animation.DROP,
+                ___data: markerData
+
+            });
+            var infowindow = new google.maps.InfoWindow({
+                content: markerData.content,
+                maxWidth: 400
+            });
+//            var infoBubble = new InfoBubble({
+//                maxWidth:400
+//            });
+//            infoBubble.addTab('Изображение', markerData.img );
+//            infoBubble.addTab('Дополнительно', markerData.content);
+
+            google.maps.event.addListener(marker, 'click', function () {
+
+//                infoBubble.open(gisTrade.map,marker);
+                infowindow.open(gisTrade.map, marker);
+            });
+            google.maps.event.addListener(gisTrade.map, 'click', function () {
+                infowindow.close();
+            });
+            gisTrade.activityMarkers.push(marker);
+        },
+        showActivityMarkers: function (show) {
+            for (var i = 0; i < gisTrade.activityMarkers.length; i++) {
+                gisTrade.activityMarkers[i].setMap(show ? gisTrade.map : null);
+            }
+        },
+        deleteActivityMarker: function (marker, index) {
+            gisTrade.activityMarkers[index].setMap(null);
+            gisTrade.activityMarkers[index] = null;
+        },
+        showMarker: function (marker) {
+            marker.setMap(gisTrade.map);
+        },
+        hideMarker: function (marker) {
+            marker.setMap(null);
+        },
+        updateMarkerCluster: function(){
+            if(gisTrade.activityMarkersCluster ){
+                gisTrade.activityMarkersCluster.setMap(null);
+            }
+
+            //gisTrade.activityMarkersCluster = new MarkerClusterer(gisTrade.map, gisTrade.activityMarkers, {/*zoomOnClick:false*/});
+            //gisTrade.activityMarkersCluster.repaint();
+
+        },
+        getAllEvents: function () {
+            $.ajax({
+                url: '<?php echo $this->getUrl('manage/event/getAllEventsJson') ?>',
+                type: 'POST',
+                dataType: 'JSON',
+                data: $('#controls-form').serialize(),
+                complete: function (response) {
+                    console.log(response);
+                    if (!response.responseJSON) {
+                        alert('Error while retrieving markers data');
+                        return false;
+                    } else {
+                        for (var event_id in response.responseJSON.data) {
+                            var data = response.responseJSON.data[event_id];
+                            var markerData = {
+                                LatLng: new google.maps.LatLng(data.lat, data.long),
+                                content: data.content,
+                                title: data.title,
+                                img: data.img,
+                                origData: data
+                            };
+                            gisTrade.addActivityMarker(markerData);
+
+                        }
+                         gisTrade.updateMarkerCluster();
+                    }
+                }
+            })
+        },
+
+        filterMarkers: function () {
+            for (var i in gisTrade.activityMarkers) {
+                var marker = gisTrade.activityMarkers[i];
+                var data = marker.___data.origData;
+                var show = true;
+                $('input.marker-field-filter').each(function () {
+                    var field = $(this).attr('field');
+                    var value = $(this).attr('field_value');
+                    if ($(this).prop('checked')) {
+                    } else {
+                        if (data[field] == value) {
+                            show = false;
+                            return false;
+                        }
+                    }
+                });
+
+                if (show) {
+                    gisTrade.showMarker(marker);
+                    //gisTrade.activityMarkersCluster.addMarker(marker) ;
+                } else {
+                    gisTrade.hideMarker(marker);
+                    //gisTrade.activityMarkersCluster.removeMarker(marker) ;
+                }
+            }
+            gisTrade.updateMarkerCluster();
+        }
+    };
+
+    $(function() {
+        $( ".tabs" ).tabs();
+
+
+
+        $.datepicker.regional['ru'] = {
+            closeText: 'Закрыть',
+            prevText: '&#x3c;Пред',
+            nextText: 'След&#x3e;',
+            currentText: 'Сегодня',
+            monthNames: ['Январь','Февраль','Март','Апрель','Май','Июнь',
+                'Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'],
+            monthNamesShort: ['Янв','Фев','Мар','Апр','Май','Июн',
+                'Июл','Авг','Сен','Окт','Ноя','Дек'],
+            dayNames: ['воскресенье','понедельник','вторник','среда','четверг','пятница','суббота'],
+            dayNamesShort: ['вск','пнд','втр','срд','чтв','птн','сбт'],
+            dayNamesMin: ['Вс','Пн','Вт','Ср','Чт','Пт','Сб'],
+            dateFormat: 'dd.mm.yy',
+            firstDay: 1,
+            isRTL: false
+        };
+        $.datepicker.setDefaults($.datepicker.regional['ru']);
+
+        $('input.datepicker').datepicker({
+            showOn: 'both'
+        });
+
+        $(document).arrive(".tabs",function(event,items){
+            $(this).tabs();
+        });
+
+
+
+    });
+
+
+</script>

@@ -1,0 +1,4 @@
+<form id="add-city-form" action="<?php $this->getUrl('manage/city/save/ajax/0') ?>" method="POST" onsubmit="return false;">
+    <input type="hidden" name="city[city_id]" value="<?php echo $this->getVar('city')->getId()?>" />
+    Город: <input type="text" name="city[name]" value="<?php echo $this->getVar('city')->getData('name')?>"/>
+</form>

@@ -17,6 +17,22 @@ class core_block{
         if($template){
             $this->setTemplate($template);
         }
+        $this->_init();
+    }
+
+    /**
+     * @param null $template
+     */
+    protected function _init(  ){
+
+        $this->_initVars();
+    }
+
+    /**
+     *
+     */
+    protected function _initVars(){
+        return $this;
     }
 
     /**
@@ -65,6 +81,15 @@ class core_block{
 
     /**
      * @param $block_name
+     * @return $this
+     */
+    public function removeChild($block_name){
+        unset($this->_children[$block_name]);
+        return $this;
+    }
+
+    /**
+     * @param $block_name
      * @return core_block
      */
     public function getChild( $block_name ){
@@ -86,28 +111,82 @@ class core_block{
         }
     }
 
+    public function getHtml(){
+        ob_start();
+        $this->renderHtml();
+        $html = ob_get_contents();
+        ob_end_clean();
+        return $html;
+    }
+
+    public function getChildHtml( $block_name ){
+        ob_start();
+        $this->renderChildHtml( $block_name );
+        $html = ob_get_contents();
+        ob_end_clean();
+        return $html;
+    }
+
     public function getTemplatePath(){
-        $mod = $this->getMod();
-        if($mod != 'core'){
-            $path = $this->parsePath(app::getConfig('design/mod/template/path') . $this->getTemplate());
-        }
-        if($mod == 'core' || !is_file( $path )){
-            $path = $this->parsePath(app::getConfig('design/core/template/path') . $this->getTemplate());
-        }
+        $path = realpath(self::getSkinDir( 'template'.DS.$this->getTemplate() ));
         return is_file( $path ) ? $path : null;
     }
 
-    public function parsePath( $path ){
-        $path = core_str::applyVars( $path, array(
-            'skin' => app::getConfig('design/skin'),
-            'mod' => $this->getMod(),
-        ) );
+    static function parseVars( $path, $vars ){
+        $path = core_str::applyVars( $path, $vars );
         return $path;
     }
 
+    static function getSkinDir( $item, $mod=null ){
+        if(self::getMod()!=='core'){
+            $path = self::parseVars(app::getConfig('design/mod/skin/path') . $item, array(
+                    'skin' => app::getConfig('design/skin'),
+                    'mod' => $mod ? $mod : self::getMod(),
+                ));
+            if(is_file( $path )){
+                return $path;
+            }
+        }
+        $path = self::parseVars(app::getConfig('design/core/skin/path') . $item, array(
+                'skin' => app::getConfig('design/skin'),
+                'mod' => $mod ? $mod : self::getMod(),
+            ));
+        return $path;
+    }
 
-    public function getMod(){
-        $class = get_class($this);
+    static function getSkinUrl( $item, $mod=null ){
+        if(preg_match('/http(s?):\/\//', $item)){
+            return $item;
+        }
+
+        if(self::getMod()!=='core'){
+            $path = self::parseVars(app::getConfig('design/mod/skin/path') . $item, array(
+                    'skin' => app::getConfig('design/skin'),
+                    'mod' => $mod ? $mod : self::getMod(),
+                ));
+            if(is_file( $path )){
+                return self::getBaseUrl($path);
+            }
+        }
+        $path = self::parseVars(app::getConfig('design/core/skin/path') . $item, array(
+                'skin' => app::getConfig('design/skin'),
+                'mod' => $mod ? $mod : self::getMod(),
+            ));
+        return self::getBaseUrl($path);
+
+    }
+
+    static function getBaseUrl( $item ){
+        return app::getConfig('url/base').($item?($item):'');
+    }
+
+    static function getUrl($url){
+        return self::getBaseUrl( $url );
+    }
+
+
+    static function getMod(){
+        $class = get_called_class();
         $mod = substr($class,0,strpos($class,'_block'));
         return $mod;
     }

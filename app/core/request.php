@@ -57,8 +57,16 @@ class core_request {
         $this->_request = $this->_safe( $_REQUEST );
         $this->_files   = $this->_safe( $_FILES );
         $this->_cookie  = $this->_safe( $_COOKIE );
-        //$this->_session = $this->_safe( $_SESSION );
+        $this->_session = new core_session( );
         $this->_server  = $this->_safe( $_SERVER );
+    }
+
+    public function getPart( $part ){
+        $part = '_'.$part;
+        return $this->$part;
+    }
+    public function getSession(){
+        return $this->getPart('session');
     }
 
     protected function _initRequest(){
@@ -68,7 +76,7 @@ class core_request {
         $parts = explode('/', $request_uri);
         $this->_mod = $parts[1];
         $this->_controller = $parts[2];
-        $this->_action = (isset($parts[3]) && $parts[3]) ? $parts[3] : self::DEFAULT_ACTION.self::ACTION_SUFFIX;
+        $this->_action = (isset($parts[3]) && $parts[3]) ? $parts[3] : core_controller::DEFAULT_ACTION.core_controller::ACTION_SUFFIX;
         unset($parts[0],$parts[1], $parts[2],$parts[3]);
         $this->addRequestVars( $parts );
         return $this;
@@ -93,6 +101,9 @@ class core_request {
             if(!isset($this->_get[$var]) && isset($vals[$k])){
                 $this->_get[$var] = $vals[$k];
             }
+            if(!isset($this->_request[$var]) && isset($vals[$k])){
+                $this->_request[$var] = $vals[$k];
+            }
         }
         return $this;
     }
@@ -100,6 +111,13 @@ class core_request {
     protected function _safe( $var ){
         //@TODO safe
         return $var;
+    }
+
+    public function getParam( $param, $default = null ){
+        if(isset($this->_request[$param])){
+            return $this->_request[$param];
+        }
+        return $default;
     }
 
     public function getControllerName( ){

@@ -1,0 +1,142 @@
+<style>
+    #add-dialog-city{
+        display:none;
+    }
+    #add-dialog-city-content{
+        text-align: center;
+    }
+</style>
+<div id="city-grid-container">
+    <div id="city-grid-container-content">
+        <img src="<?php echo self::getSkinUrl('images/progress-bar.gif') ?>"/>
+    </div>
+</div>
+<div id="add-dialog-city">
+    <div id="add-dialog-city-content">
+        <img src="<?php echo self::getSkinUrl('images/progress-bar.gif') ?>"/>
+    </div>
+</div>
+<button class="button" id="add-city" url="<?php echo $this->getUrl('manage/city/add_form') ?>">Добавить</button>
+<script>
+
+    progressBar = '<img src="<?php echo self::getSkinUrl("images/progress-bar.gif") ?>"/>';
+    cityManager = {
+        updateList: function(){
+            $('#city-grid-container-content').html(progressBar);
+            $.ajax({
+               type: 'POST',
+               url: '<?php echo $this->getUrl('manage/city/grid') ?>',
+               complete: function(response){
+                   $('#city-grid-container-content').html(response.responseText);
+               }
+
+            });
+        },
+        saveCity: function(){
+            var data = $('#add-city-form').serialize();
+            $('#add-dialog-city-content').html(progressBar);
+            $.ajax({
+                type: 'POST',
+                url: '<?php echo $this->getUrl('manage/city/save') ?>',
+                data: data,
+                complete: function(response){
+                    $('#add-dialog-city-content').html(response.responseText);
+                    $('#add-dialog-city').dialog({
+                        modal: true,
+                        width: 400,
+                        buttons: [
+                            {
+                                text: "Закрыть",
+                                click: function() {
+                                    $( this ).dialog( "close" );
+                                    cityManager.updateList();
+                                }
+                            }
+                        ]
+                    });
+                }
+            });
+        },
+        getForm: function( city_id ){
+            $('#add-dialog-city-content').html(progressBar);
+            $('#add-dialog-city').dialog({
+                modal: true,
+                width: 400,
+                buttons: [
+                    {
+                        text: "Сохранить",
+                        click: function() {
+                            cityManager.saveCity();
+                        }
+                    },
+                    {
+                        text: "Отмена",
+                        click: function() {
+                            $( this ).dialog( "close" );
+                        }
+                    }
+                ]
+            });
+            $.ajax({
+                type: 'POST',
+                url: $('#add-city').attr('url'),
+                data:{
+                    city_id: city_id
+                },
+                complete: function(response){
+                    $('#add-dialog-city-content').html(response.responseText);
+                }
+            });
+        },
+
+        deleteCity: function(city_id){
+            $('#add-dialog-city-content').html('Удалить?');
+            $('#add-dialog-city').dialog({
+                modal: true,
+                width: 400,
+                buttons: [
+                    {
+                        text: "Удалить",
+                        click: function() {
+                            var dialog=this;
+                            $.ajax({
+                                type: 'POST',
+                                url: '<?php echo $this->getUrl('manage/city/delete')?>',
+                                data: {city_id: city_id},
+                                complete: function(response){
+                                    $('#add-dialog-city-content').html(response.responseText);
+                                    $( dialog ).dialog( {
+                                        buttons:[{
+                                            text: "Закрыть",
+                                            click: function() {
+                                                $( this ).dialog( "close" );
+                                                $('tr[city_id='+city_id+']').animate({opacity:0},'slow',function(){
+                                                    $(this).remove();
+                                                });
+                                            }
+                                        }]
+                                    } );
+                                }
+                            });
+                        }
+                    },
+                    {
+                        text: "Отмена",
+                        click: function() {
+                            $( this ).dialog( "close" );
+                        }
+                    }
+                ]
+            });
+        }
+    };
+
+    (function($){
+
+        cityManager.updateList();
+        $('#add-city').click(function(){
+            cityManager.getForm();
+        });
+
+    })(jQuery)
+</script>

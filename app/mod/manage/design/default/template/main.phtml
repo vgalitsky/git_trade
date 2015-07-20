@@ -1,0 +1,62 @@
+<?php /** @var manage_block_main $this*/ ?>
+<style>
+    #manage-tabs .tab-content{
+        height:380px;
+    }
+</style>
+<div class="main">
+    <div id="manage-tabs" class="tabs">
+    <ul >
+        <li><a href="#manage-tab-traders">Пользователи</a></li>
+        <li><a href="#manage-tab-activities">Активности</a></li>
+        <li><a href="#manage-tab-city">Города</a></li>
+    </ul>
+        <div class="tab-content" id="manage-tab-activities"><img src="<?php echo self::getSkinUrl("images/progress-bar.gif", 'manage') ?>"/></div>
+        <div class="tab-content" id="manage-tab-city"><img src="<?php echo self::getSkinUrl("images/progress-bar.gif", 'manage') ?>"/></div>
+        <div class="tab-content" id="manage-tab-traders"><img src="<?php echo self::getSkinUrl("images/progress-bar.gif", 'manage') ?>"/></div>
+</div>
+<div class="clear"></div>
+<script>
+    (function($){
+        $.ajax({
+           url: '<?php echo $this->getUrl('manage/city/list')?>',
+           complete: function(response){
+               $('#manage-tab-city').html(response.responseText);
+           }
+        });
+        $.ajax({
+           url: '<?php echo $this->getUrl('manage/activity/list')?>',
+           complete: function(response){
+               $('#manage-tab-activities').html(response.responseText);
+           }
+        });
+        $.ajax({
+           url: '<?php echo $this->getUrl('manage/user/list')?>',
+           complete: function(response){
+               $('#manage-tab-traders').html(response.responseText);
+           }
+        });
+    })(jQuery);
+</script>
+
+<script>
+
+    (function($){
+        $('button').button();
+        $(document).arrive("button",function(event,items){
+            $(this).button();
+        });
+
+        $(document).arrive(".ui-icon",function(event,items){
+            $(this).hover(
+                function() {
+                    $( this).parent().addClass( "ui-state-hover" );
+                },
+                function() {
+                    $( this).parent().removeClass( "ui-state-hover" );
+                }
+            );
+        });
+    })(jQuery);
+
+</script>

@@ -1,0 +1,63 @@
+<?php
+/** @var manage_model_user $user */
+$user = $this->getVar('user');
+
+/** @var manage_model_user_collection $user */
+$managers = $this->getVar('managers');
+?>
+<form id="add-user-form" action="<?php $this->getUrl('manage/user/save/ajax/1') ?>" method="POST" onsubmit="return false;">
+    <input type="hidden" name="user[user_id]" value="<?php echo $user->getId()?>" />
+    <table style="text-align:left">
+        <tr>
+            <td>Тип</td>
+            <td>
+                <select name="user[role_id]" <?php if($user->getId()) echo 'disabled'?>>
+                    <option value="<?php echo manage_model_role::ROLE_AGENT ?>">Агент</option>
+                    <option value="<?php echo manage_model_role::ROLE_MANAGER ?>">Менеджер</option>
+                    <option value="<?php echo manage_model_role::ROLE_ADMIN ?>">Администратор</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>IMEI</td>
+            <td><input type="text" name="user[imei]" value="<?php echo $user->getData('imei')?>"/></td>
+        </tr>
+        <tr>
+            <td>№ Телефона</td>
+            <td><input type="text" name="user[phone]" value="<?php echo $user->getData('phone')?>"/></td>
+        </tr>
+        <tr>
+            <td>Email</td>
+            <td><input type="text" name="user[username]" value="<?php echo $user->getData('username')?>"/></td>
+        </tr>
+        <tr>
+            <td>Имя (ФИО)</td>
+            <td><input type="text" name="user[fullname]" value="<?php echo $user->getData('fullname')?>"/></td>
+        </tr>
+        <tr id="user-form-parent-id" class="<?php if($user->getId() && $user->getData('role_id')!=manage_model_role::ROLE_AGENT) echo 'hidden' ?>">
+            <td>Менеджер</td>
+            <td>
+                <select name="user[parent_id]" value="<?php $user->getData('parent_id') ?>">
+                    <?php foreach($managers as $manager):?>
+                        <option value="<?php echo $manager->getId() ?>"><?php echo $manager->getData('fullname') ?></option>
+                    <?php endforeach;?>
+                </select>
+            </td>
+        </tr>
+    </table>
+</form>
+<script>
+    (function($){
+        $('select[name=user\\[parent_id\\]]').val('<?php echo $user->getData('parent_id') ?>');
+        $('select[name=user\\[role_id\\]]').val('<?php echo $user->getData('role_id') ?>');
+
+        $('select[name=user\\[role_id\\]]').on('change',function(){
+            if($(this).val()!=='<?php echo manage_model_role::ROLE_AGENT ?>'){
+                $('#user-form-parent-id').hide();
+            }else{
+                $('#user-form-parent-id').show();
+            }
+        });
+        $('#add-dialog-user').dialog({title: '<?php echo $user->getData('fullname'); ?>'});
+    })(jQuery);
+</script>

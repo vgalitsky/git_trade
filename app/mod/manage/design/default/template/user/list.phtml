@@ -1,0 +1,145 @@
+<style>
+    #add-dialog-user{
+        display:none;
+    }
+    #add-dialog-user-content{
+        text-align: center;
+    }
+    .grid-container{
+        overflow: auto;
+    }
+</style>
+<div id="user-grid-container">
+    <div id="user-grid-container-content" class="grid-container">
+        <img src="<?php echo self::getSkinUrl('images/progress-bar.gif') ?>"/>
+    </div>
+</div>
+<div id="add-dialog-user">
+    <div id="add-dialog-user-content">
+        <img src="<?php echo self::getSkinUrl('images/progress-bar.gif') ?>"/>
+    </div>
+</div>
+<button class="button" id="add-user" url="<?php echo $this->getUrl('manage/user/add_form') ?>">Добавить</button>
+<script>
+
+    progressBar = '<img src="<?php echo self::getSkinUrl("images/progress-bar.gif") ?>"/>';
+    userManager = {
+        updateList: function(){
+            $('#user-grid-container-content').html(progressBar+'121212');
+            $.ajax({
+               type: 'POST',
+               url: '<?php echo $this->getUrl('manage/user/grid') ?>',
+               complete: function(response){
+                   $('#user-grid-container-content').html(response.responseText);
+               }
+
+            });
+        },
+        saveuser: function(){
+            var data = $('#add-user-form').serialize();
+            $('#add-dialog-user-content').html(progressBar);
+            $.ajax({
+                type: 'POST',
+                url: '<?php echo $this->getUrl('manage/user/save') ?>',
+                data: data,
+                complete: function(response){
+                    $('#add-dialog-user-content').html(response.responseText);
+                    $('#add-dialog-user').dialog({
+                        modal: true,
+                        width: 400,
+                        buttons: [
+                            {
+                                text: "Закрыть",
+                                click: function() {
+                                    $( this ).dialog( "close" );
+                                    userManager.updateList();
+                                }
+                            }
+                        ]
+                    });
+                }
+            });
+        },
+        getForm: function( user_id ){
+            $('#add-dialog-user-content').html(progressBar);
+            $('#add-dialog-user').dialog({
+                modal: true,
+                width: 400,
+                buttons: [
+                    {
+                        text: "Сохранить",
+                        click: function() {
+                            userManager.saveuser();
+                        }
+                    },
+                    {
+                        text: "Отмена",
+                        click: function() {
+                            $( this ).dialog( "close" );
+                        }
+                    }
+                ]
+            });
+            $.ajax({
+                type: 'POST',
+                url: $('#add-user').attr('url'),
+                data:{
+                    user_id: user_id
+                },
+                complete: function(response){
+                    $('#add-dialog-user-content').html(response.responseText);
+                }
+            });
+        },
+
+        deleteuser: function(user_id){
+            $('#add-dialog-user-content').html('Удалить?');
+            $('#add-dialog-user').dialog({
+                modal: true,
+                width: 400,
+                buttons: [
+                    {
+                        text: "Удалить",
+                        click: function() {
+                            var dialog=this;
+                            $.ajax({
+                                type: 'POST',
+                                url: '<?php echo $this->getUrl('manage/user/delete')?>',
+                                data: {user_id: user_id},
+                                complete: function(response){
+                                    $('#add-dialog-user-content').html(response.responseText);
+                                    $( dialog ).dialog( {
+                                        buttons:[{
+                                            text: "Закрыть",
+                                            click: function() {
+                                                $( this ).dialog( "close" );
+                                                $('tr[user_id='+user_id+']').animate({opacity:0},'slow',function(){
+                                                    $(this).remove();
+                                                });
+                                            }
+                                        }]
+                                    } );
+                                }
+                            });
+                        }
+                    },
+                    {
+                        text: "Отмена",
+                        click: function() {
+                            $( this ).dialog( "close" );
+                        }
+                    }
+                ]
+            });
+        }
+    };
+
+    (function($){
+
+        userManager.updateList();
+        $('#add-user').click(function(){
+            userManager.getForm();
+        });
+
+    })(jQuery)
+</script>

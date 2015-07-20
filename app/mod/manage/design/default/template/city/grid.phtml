@@ -1,0 +1,24 @@
+<?php /** @var manage_block_city_grid $this*/?>
+<table id="city-grid" cellspacing="0" cellpadding="0" width="100%" style="">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Город</th>
+            <th>К-во событий</th>
+            <th></th>
+        </tr>
+    </thead>
+<?php foreach($this->getVar('collection') as $city): ?>
+    <tr city_id="<?php echo $city->getId()?>">
+        <td><?php echo $city->getId()?></td>
+        <td><?php echo $city->getData('name')?></td>
+        <td align="right">
+            <ul id="icons" class="ui-widget ui-helper-clearfix right">
+                <li onclick="cityManager.filterMap(<?php echo $city->getId()?>)" class="ui-state-default ui-corner-all" title="Фильтровать события для этого города на карте"><span class="ui-icon ui-icon-search"></span></li>
+                <li onclick="cityManager.getForm(<?php echo $city->getId()?>)" class="ui-state-default ui-corner-all" title="Изменить"><span class="ui-icon ui-icon-pencil"></span></li>
+                <li onclick="cityManager.deleteCity(<?php echo $city->getId()?>)" city_id="<?php echo $city->getId()?>" class="city-grid-delete ui-state-default ui-corner-all" title="Удалить"><span class="ui-icon ui-icon-trash"></span></li>
+             </ul>
+        </td>
+    </tr>
+<?php endforeach?>
+</table>

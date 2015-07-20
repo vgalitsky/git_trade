@@ -1,0 +1,22 @@
+<?php /** @var manage_block_template $this */ ?>
+<?php if($this->getVar('content')):?>
+<?php echo $this->getVar('content')?>
+<?php endif ?>
+<?php if($this->getVar('success')):?>
+    <div class="ui-widget">
+        <div class="ui-state-highlight ui-corner-all" style="margin-top: 20px; padding: 0 .7em;">
+            <p><span class="ui-icon ui-icon-info" style="float: left; margin-right: .3em;"></span>
+                <strong>Ок</strong> <?php echo $this->getVar('success')?></p>
+        </div>
+    </div>
+
+<?php endif ?>
+<?php if($this->getVar('error')):?>
+    <div class="ui-widget">
+        <div class="ui-state-error ui-corner-all" style="padding: 0 .7em;">
+            <p><span class="ui-icon ui-icon-alert" style="float: left; margin-right: .3em;"></span>
+                <strong>Ошибка:</strong> <?php echo $this->getVar('error')?></p>
+        </div>
+    </div>
+
+<?php endif ?>

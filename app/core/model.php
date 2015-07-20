@@ -1,8 +1,7 @@
 <?php
-class core_model extends core_object{
+class core_model extends core_db{
 
-    /** @var  PDO */
-    static $connection;
+
     /** @var  array */
     protected $_data;
     /** @var  array */
@@ -14,12 +13,14 @@ class core_model extends core_object{
     /** @var  array */
     static $_describe;
 
+    static $___id_field;
+
     /**
      * @param null $table
      * @param null $idfield
      */
     public function __construct( $table = null, $idfield = null){
-        $this->setConnection( app::getConnection() );
+        parent::__construct();
         if($table){
             $this->_init( $table, $idfield);
         }
@@ -33,6 +34,7 @@ class core_model extends core_object{
     protected function _init( $table, $idfield = 'id' ){
         $this->_table = $table;
         $this->_idfield = $idfield;
+        self::$___id_field = $idfield;
         $this->describe();
         return $this;
     }
@@ -42,6 +44,10 @@ class core_model extends core_object{
      */
     public function getIdField(){
         return $this->_idfield;
+    }
+
+    static function ___getIdField(){
+        return self::$___id_field;
     }
 
     /**
@@ -55,7 +61,14 @@ class core_model extends core_object{
      * @return array|null
      */
     public function getId(){
-        return $this->getData( $this->getIdField());
+        return $this->getData( $this->getIdField() );
+    }
+
+    /**
+     * @param $id
+     */
+    public function setId($id){
+        $this->setData($this->getIdField(),$id);
     }
 
     /**
@@ -75,21 +88,7 @@ class core_model extends core_object{
         return self::$_describe;
     }
 
-    /**
-     * @param PDO $connection
-     * @return $this
-     */
-    public function setConnection($connection){
-        self::$connection = $connection;
-        return $this;
-    }
 
-    /**
-     * @return PDO
-     */
-    public function getConnection(){
-        return self::$connection;
-    }
 
 
 
@@ -118,6 +117,13 @@ class core_model extends core_object{
         return isset($this->_data[$var]) ? $this->_data[$var] : null;
     }
 
+    public function unsetData($var){
+        if(isset($this->_data[$var])){
+            unset($this->_data[$var]);
+        }
+        return $this;
+    }
+
     public function setOrigData($data){
         $this->_origData = $data;
         return $this;
@@ -140,6 +146,7 @@ class core_model extends core_object{
         }else{
             $this->_create();
         }
+
         $this->_afterSave();
         return $this;
     }
@@ -165,6 +172,9 @@ class core_model extends core_object{
                 $values[$field]=$value;
             }
         }
+        if($set===''){
+            return $this;
+        }
         $set = substr($set,0,-2);
         $values['id']=$this->getId();
         $sql = "UPDATE {$this->getTable()} SET {$set} WHERE {$this->getIdField()}=:id";
@@ -181,6 +191,7 @@ class core_model extends core_object{
         $values = array();
         $set = '';
         foreach( $this->getData() as $field=>$value){
+
             if($field === $this->getIdField()){
                 continue;
             }
@@ -195,6 +206,8 @@ class core_model extends core_object{
         /** @var PDOStatement $stmt */
         $stmt = $this->getConnection()->prepare( $sql );
         $stmt->execute($values);
+        $this->setId($this->getConnection()->lastInsertId());
+        $this->setOrigData($this->getData());
         return $this;
     }
 
@@ -227,11 +240,12 @@ class core_model extends core_object{
      * @return bool
      */
     public function hasField( $field ){
-        return isset($this->_describe[$field]);
+        $describe = self::$_describe;
+        return isset($describe[$field]);
     }
 
-    protected function _beforeLoad( $value, $field){return $this;}
-    protected function _afterLoad( $value, $field){return $this;}
+    public function _beforeLoad( ){return $this;}
+    public function _afterLoad( ){return $this;}
 
     /**
      * @param $value
@@ -239,6 +253,7 @@ class core_model extends core_object{
      * @return $this
      */
     public function load( $value, $field=null){
+        if(!$value){ return $this;}
         $field = $field ? $field : $this->getIdField();
         $this->_beforeLoad($value, $field);
 
@@ -250,24 +265,40 @@ class core_model extends core_object{
         $data = $stmt->fetch();
 
         //do not use numeric index
-        foreach( $data as $k=>$value){
-            if(is_numeric($k)){
-                unset($data[$k]);
-            }else{
-                $this->setData($k,$value);
-            }
-        }
+//        foreach( $data as $k=>$value){
+//            if(is_numeric($k)){
+//                unset($data[$k]);
+//            }else{
+//                $this->setData($k,$value);
+//            }
+//        }
+        $this->setData( $data );
         $this->setOrigData( $data );
 
-        $this->_afterLoad($value, $field);
+        $this->_afterLoad();
+        return $this;
+    }
+
+    public function delete(){
+        if(!$this->getId()){
+            throw new Exception('Id was not given');
+        }
+        $sql = "DELETE FROM {$this->getTable()} WHERE {$this->getIdField()}=:value";
+        /** @var PDOStatement $stmt */
+        $stmt = $this->getConnection()->prepare( $sql );
+        $stmt->execute(array('value'=>$this->getId()));
         return $this;
     }
 
     public function getCollection(){
         $collection_class = get_class($this).'_collection';
+        if(!class_exists($collection_class)){
+            $collection_class = 'core_collection';
+        }
         $collection = new $collection_class(get_class($this),$this->getTable());
         $collection->setConnection($this->getConnection());
         return $collection;
     }
+
 
 }

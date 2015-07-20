@@ -5,6 +5,8 @@ class core_controller {
     const DEFAULT_ACTION = 'index';
     const ACTION_SUFFIX = 'Action';
 
+    protected $_actionMethod;
+
     /** @var  core_request */
     protected $_request;
 
@@ -58,7 +60,24 @@ class core_controller {
         if(!method_exists($this,$actionMethod)){
             throw new Exception("Controller action {$actionMethod} not found");
         }
+        $this->_actionMethod = $actionMethod;
+        $this->_predispatchAction();
+        $actionMethod = $this->_actionMethod;
         $this->$actionMethod();
         return $this;
     }
+
+    protected function _predispatchAction(){
+        return $this;
+    }
+
+    static function okJson($data){
+        return json_encode(array('ok'=>true,'data'=>$data));
+    }
+
+    static function errJson($err){
+        return json_encode(array('ok'=>false,'err'=>$err));
+    }
+
+
 }

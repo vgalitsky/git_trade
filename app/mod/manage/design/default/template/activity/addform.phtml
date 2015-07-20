@@ -1,0 +1,8 @@
+<?php
+/** @var manage_model_activity $activity */
+$activity = $this->getVar('activity');
+?>
+<form id="add-activity-form" action="<?php $this->getUrl('manage/activity/save/ajax/1') ?>" method="POST" onsubmit="return false;">
+    <input type="hidden" name="activity[activity_id]" value="<?php echo $activity->getId()?>" />
+    Активность: <input type="text" name="activity[name]" value="<?php echo $activity->getData('name')?>"/>
+</form>

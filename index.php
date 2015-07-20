@@ -1,4 +1,3 @@
-<pre>
 <?php
 error_reporting(E_ALL | E_STRICT);
 ini_set('display_errors', 1);
@@ -13,6 +12,3 @@ $app = new app( $___config );
 
 $app->run();
 ?>
-<pre>
-<?php
-var_dump($app);

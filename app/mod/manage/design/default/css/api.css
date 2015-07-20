@@ -1,0 +1,42 @@
+.clear{
+    clear:both;
+}
+.right{
+    float: right;
+}
+.left{
+    float:left;
+}
+
+.hidden{
+    display: none;
+}
+
+#icons {
+    margin: 0;
+    padding: 0;
+}
+#icons li {
+    margin: 2px;
+    position: relative;
+    padding: 4px 0;
+    cursor: pointer;
+    float: left;
+    list-style: none;
+}
+#icons span.ui-icon {
+    float: left;
+    margin: 0 4px;
+}
+thead{
+    text-align:left;
+    background-color: #efefef;
+}
+tbody tr:nth-child(even){
+    background-color:#efefef;
+}
+td{
+    padding:2px;
+}
+
+
