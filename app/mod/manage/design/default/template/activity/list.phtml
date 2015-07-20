@@ -7,6 +7,8 @@
     }
 </style>
 <div id="activity-grid-container">
+    <button style="font-size:12px" class="button" id="add-activity" url="<?php echo $this->getUrl('manage/activity/add_form') ?>">Добавить</button>
+    <hr/>
     <div id="activity-grid-container-content">
         <img src="<?php echo self::getSkinUrl('images/progress-bar.gif') ?>"/>
     </div>
@@ -16,7 +18,7 @@
         <img src="<?php echo self::getSkinUrl('images/progress-bar.gif') ?>"/>
     </div>
 </div>
-<button class="button" id="add-activity" url="<?php echo $this->getUrl('manage/activity/add_form') ?>">Добавить</button>
+
 <script>
 
     progressBar = '<img src="<?php echo self::getSkinUrl("images/progress-bar.gif") ?>"/>';

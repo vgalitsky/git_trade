@@ -55,7 +55,7 @@ $managers = $this->getVar('managers');
         <td class="u-f-activity_count"><?php echo $user->getData('activity_count')?></td>
         <td >
             <ul id="icons" class="ui-widget ui-helper-clearfix right">
-                <li onclick="userManager.filterMap(<?php echo $user->getId()?>)" class="ui-state-default ui-corner-all" title="Фильтровать события для этого пользователя на карте"><span class="ui-icon ui-icon-search"></span></li>
+                <!--li onclick="userManager.filterMap(<?php echo $user->getId()?>)" class="ui-state-default ui-corner-all" title="Фильтровать события для этого пользователя на карте"><span class="ui-icon ui-icon-search"></span></li-->
                 <li onclick="userManager.getForm(<?php echo $user->getId()?>)" class="ui-state-default ui-corner-all" title="Изменить"><span class="ui-icon ui-icon-pencil"></span></li>
                 <li onclick="userManager.deleteuser(<?php echo $user->getId()?>)" user_id="<?php echo $user->getId()?>" class="user-grid-delete ui-state-default ui-corner-all" title="Удалить"><span class="ui-icon ui-icon-trash"></span></li>
              </ul>

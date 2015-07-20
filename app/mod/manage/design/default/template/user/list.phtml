@@ -10,16 +10,19 @@
     }
 </style>
 <div id="user-grid-container">
+    <button style="font-size:12px;" class="button" id="add-user" url="<?php echo $this->getUrl('manage/user/add_form') ?>">Добавить</button>
+    <hr/>
     <div id="user-grid-container-content" class="grid-container">
         <img src="<?php echo self::getSkinUrl('images/progress-bar.gif') ?>"/>
     </div>
 </div>
 <div id="add-dialog-user">
+
     <div id="add-dialog-user-content">
         <img src="<?php echo self::getSkinUrl('images/progress-bar.gif') ?>"/>
     </div>
 </div>
-<button class="button" id="add-user" url="<?php echo $this->getUrl('manage/user/add_form') ?>">Добавить</button>
+
 <script>
 
     progressBar = '<img src="<?php echo self::getSkinUrl("images/progress-bar.gif") ?>"/>';
