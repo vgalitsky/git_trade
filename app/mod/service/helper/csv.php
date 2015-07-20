@@ -12,7 +12,7 @@ class service_helper_csv extends core_helper{
             }
 
             // Enclose fields containing $delimiter, $enclosure or whitespace
-            if ( $encloseAll || preg_match( "/(?:${delimiter_esc}|${enclosure_esc}|\s)/", $field ) ) {
+            if (1 || $encloseAll || preg_match( "/(?:${delimiter_esc}|${enclosure_esc}|\s)/", $field ) ) {
                 $output[] = $enclosure . str_replace($enclosure, $enclosure . $enclosure, $field) . $enclosure;
             }
             else {
