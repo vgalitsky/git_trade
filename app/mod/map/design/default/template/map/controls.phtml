@@ -192,7 +192,7 @@ $luser = app::getSession()->getLoggedInUser();
 </style>
 <div id="manage-toolbar">
     <?php if($luser->getData('role_id')== manage_model_role::ROLE_ADMIN) : ?>
-    <a id="manage" href="#manage">Администрирование</a>
+    <a id="manage" href="javascript:void(0);">Администрирование</a>
     <?php endif; ?>
     <a  href="<?php echo $this->getUrl('map/index/logout')?>">Выход</a>
 </div>
@@ -217,6 +217,7 @@ $luser = app::getSession()->getLoggedInUser();
                     {
                         text: "Закрыть",
                         click: function () {
+                            location.href=location.href;
                             $(this).dialog("close");
                         }
                     }

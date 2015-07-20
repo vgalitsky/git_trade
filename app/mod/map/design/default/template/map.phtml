@@ -5,7 +5,7 @@
 
     function initialize() {
         var mapOptions = {
-            zoom: 9,
+            zoom: 12,
             mapTypeControl: true,
             zoomControl: true,
             zoomControlOptions: {
@@ -88,6 +88,7 @@
 
 
             gisTrade.showActivityMarkers(true);
+            //gisTrade.filterMarkers();
         },
         addActivityMarker: function (markerData) {
             var marker = new google.maps.Marker({
@@ -168,6 +169,13 @@
                         }
                          gisTrade.updateMarkerCluster();
                     }
+                    var markers = gisTrade.activityMarkers;
+                    var bounds = new google.maps.LatLngBounds();
+                    for(i=0;i<markers.length;i++) {
+                        bounds.extend(markers[i].getPosition());
+                    }
+
+                    gisTrade.map.fitBounds(bounds);
                 }
             })
         },

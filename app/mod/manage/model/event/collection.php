@@ -2,12 +2,18 @@
 class manage_model_event_collection extends core_collection{
 
     public function prepareSql(){
+        $parent_where = '';
+        $luser = app::getSession()->getLoggedInUser();
+        if($luser && $luser->getData('role_id')==manage_model_role::ROLE_MANAGER){
+            $parent_where = " AND user.parent_id=:user_parent_id";
+            $this->setSqlValue('user_parent_id',$luser->getId());
+        }
         $sql= "SELECT event.*,
                 user.user_id, user.fullname as user_fullname,
                 city.city_id as city_id, city.name as city_name,
                 activity.activity_id as activity_id, activity.name as activity_name
               FROM `{$this->getTable()}` as event
-              LEFT JOIN user ON event.user_id=user.user_id
+              RIGHT JOIN user ON event.user_id=user.user_id {$parent_where}
               LEFT JOIN city ON event.city_id=city.city_id
               LEFT JOIN activity ON event.activity_id=activity.activity_id
               WHERE 1 ";

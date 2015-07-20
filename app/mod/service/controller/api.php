@@ -3,7 +3,11 @@ class service_controller_api extends core_controller{
 
 
     public function getActivitiesAction(){
-
+        $activity_model = new manage_model_activity();
+        /** @var manage_model_activity_collection $ac */
+        $ac = $activity_model->getCollection();
+        $ac->load();
+        echo service_helper_csv::arraysToCsv( $ac->toArray( ) );
     }
 
     public function selectAction(){
@@ -12,9 +16,9 @@ class service_controller_api extends core_controller{
         service_helper_sql::assertSqlReadonly($sql);
         $stmt = app::getConnection()->prepare($sql);
         $stmt->execute();
-        $all = $stmt->fetchAll();
-        echo '<pre>';
-        print_r($all);
+        $all = $stmt->fetchAll(pdo::FETCH_ASSOC);
+        //echo '<pre>';
+        //print_r($all);
         echo service_helper_csv::arraysToCsv($all);
     }
 
