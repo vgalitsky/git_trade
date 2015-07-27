@@ -1,3 +1,3 @@
 <?php
-define('DS','/');
+define('DS',DIRECTORY_SEPARATOR);
 define('CS','_');

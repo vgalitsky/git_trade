@@ -32,10 +32,14 @@ $___config->setData(array(
     ),
 
     'url' => array(
-        'base' => 'http://gis.local/'
+        'base' => 'http://gis.local/',
     ),
+
 
     'dir' => array(
         'base' => __DIR__,
+        'sd' => __DIR__.DS.'sd'.DS,
+        'log' => __DIR__.DS.'sd'.DS.'log'.DS
     ),
+
 ));

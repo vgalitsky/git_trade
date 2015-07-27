@@ -22,7 +22,7 @@ class core_autoload {
      * @return bool
      */
     static function core_autoload( $class_name ){
-        $path = preg_replace('/'.CS.'/','/', $class_name);
+        $path = preg_replace('/'.CS.'/',DS, $class_name);
         $path = self::$_BASE_CODE_PATH . DS . $path . '.php';
         if(file_exists($path)){
             include_once($path);
@@ -37,7 +37,7 @@ class core_autoload {
      * @return bool
      */
     static function mod_autoload( $class_name, $type = '' ){
-        $path = preg_replace('/'.CS.'/','/', $class_name);
+        $path = preg_replace('/'.CS.'/',DS, $class_name);
         $path = self::$_MOD_PATH .DS. ($type ? ($type .DS) : '') . $path . '.php';
         if(file_exists($path)){
             include_once($path);

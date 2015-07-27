@@ -176,7 +176,7 @@ class core_block{
 
     }
 
-    static function getBaseUrl( $item ){
+    static function getBaseUrl( $item = null ){
         return app::getConfig('url/base').($item?($item):'');
     }
 

@@ -5,4 +5,10 @@ class manage_model_activity extends core_model{
         parent::__construct('activity','activity_id');
     }
 
+    public function _beforeSave(){
+        parent::_beforeSave();
+        $this->setData('name',strtolower($this->getData('name')));
+
+    }
+
 }
