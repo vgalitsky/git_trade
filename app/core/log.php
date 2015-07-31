@@ -7,9 +7,13 @@ class core_log{
         if( !is_string($message)  ){
             $message = core_debug::dump($message, false);
         }
-        $fpath = app::getConfig('dir/sd'.DS.self::LOG_DIR.DS.$logfile);
+
+        $fpath = app::getConfig('dir/sd').DS.self::LOG_DIR.DS.$logfile;
         core_fs::createDirIfNotExists(dirname($fpath));
-        file_put_contents($fpath,$message);
+        $fh = fopen($fpath,'a+');
+        fputs($fh,$message."\n");
+        fclose($fh);
+
         return $fpath;
     }
 

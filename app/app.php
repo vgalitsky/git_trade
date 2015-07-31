@@ -92,8 +92,8 @@ class app{
         return $model;
     }
 
-    static function getBaseDir(){
-        return self::getConfig('dir/base');
+    static function getBaseDir( $dir = null ){
+        return self::getConfig('dir/base').($dir?(DS.$dir):'');
     }
 
     /**

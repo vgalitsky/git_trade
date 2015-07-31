@@ -47,7 +47,6 @@ class manage_model_event extends core_model{
                 /* get mail structure */
                 $structure = imap_fetchstructure($inbox, $email_number);
 
-                //core_debug::dump($structure);
 
                 $attachments = array();
 
@@ -59,17 +58,19 @@ class manage_model_event extends core_model{
                         if(!strlen($bodyText)>0){
                             $bodyText = imap_fetchbody($inbox,$email_number,1);
                         }
-                        $subject = imap_headerinfo($inbox,$email_number);
-                        $subject = $subject->subject;
+                        $hinfo = imap_headerinfo($inbox,$email_number);
+                        $subject = $hinfo->subject;
 
 
                         $attachments[$i] = array(
+                            'email_number'=>$email_number,
                             'is_attachment' => false,
+                            'date' => $hinfo->date,
                             'filename' => '',
                             'name' => '',
                             'attachment' => '',
-                            'subject' => $subject,
-                            'csv' => $bodyText,
+                            'subject' => imap_utf8($subject),
+                            'csv' => imap_utf8($bodyText),
                         );
 
                         if ($structure->parts[$i]->ifdparameters) {
@@ -107,6 +108,7 @@ class manage_model_event extends core_model{
                 /* iterate through each attachment and save it */
                 foreach ($attachments as $attachment) {
                     if ($attachment['is_attachment'] == 1) {
+                        core_log::log( "START: Processing email [{$attachment['email_number']}]: {$attachment['subject']} ({$attachment['date']})" ,'event.imap.log');
                         $filename = $attachment['name'];
                         if (empty($filename)) $filename = $attachment['filename'];
 
@@ -115,15 +117,20 @@ class manage_model_event extends core_model{
                         /* prefix the email number to the filename in case two emails
                          * have the attachment with the same file name.
                          */
-                        $path = app::getBaseDir("sd".DS."event".DS."img");
-                        core_fs::createDirIfNotExists( $path  );
-                        $fullname = $path.DS. time() . "-" . $filename;
-                        $fp = fopen($fullname, "w+");
-                        fwrite($fp, $attachment['attachment']);
-                        fclose($fp);
+                        try {
+                            $path = app::getConfig("dir/sd") . "event" . DS . "img"
+                                . DS . uniqid(time() . '-') . "-" . $filename;
+                            core_fs::createDirIfNotExists(dirname($path));
+                            $fp = fopen($path, "w+");
+                            fwrite($fp, $attachment['attachment']);
+                            fclose($fp);
 
-                        $attachment['full_filename'] =$fullname;
-                        $this->_email2event($attachment);
+                            $attachment['full_filename'] = $path;
+                            $event = $this->_email2event($attachment);
+                            core_log::log( "DONE: ID={$event->getId()} ({$path})" ,'event.imap.log');
+                        }catch(Exception $e){
+                            core_log::log( "ERROR: {$e->getMessage()}" ,'event.imap.log');
+                        }
 
                     }
 
@@ -137,23 +144,14 @@ class manage_model_event extends core_model{
     }
 
     protected function _email2event( $email ){
-//        $email = array(
-//            'is_attachment' => false,
-//            'filename' => '',
-//            'name' => '',
-//            'attachment' => '',
-//            'subject' => $subject,
-//            'csv' => $bodyText,
-//        );
-        //core_debug::dump($email);die('dfg');
+
         $bodyData = $this->_pareseEmailBodyCsv( $email['csv'] );
-        core_log::log($bodyData,'event.imap.log');
 
-        die('sadfsa');
-
-        $eventData = array(
+        $eventData = array_merge(
+            array(
             'image' => app::getUrl($email['full_filename']),
-            
+            ),
+            $bodyData
         );
 
         $event = new manage_model_event();
@@ -163,25 +161,58 @@ class manage_model_event extends core_model{
     }
 
     protected function _pareseEmailBodyCsv($csv){
-        $array = str_getcsv(trim(str_replace("\n",'',$csv)),';');
-        core_debug::dump($csv);
-        core_debug::dump($array);
+        $csv = strip_tags(html_entity_decode(trim(str_replace("\n",'',str_replace("\r",'',$csv)))));
+        $array = str_getcsv($csv,';');
+
+        $lat = $array[1];
+        $long = $array[2];
+
         $data = array(
             'imei'      => $array[0],
-            'lat'       => $array[1],
-            'long'      => $array[2],
+            'lat'       => $lat,
+            'long'      => $long,
             'date'      => $array[3],
-            'activity_id'  => $this->_getActivityIdByName( $array[4] ),
-            'city_id'  => $this->_getCityIdByName( core_google_geo::getCityNameByLatLng() ),
+            'activity_id'  => $array[4],//$this->_getActivityIdByName( $array[4] ),
+            'city_id'  => $this->_getCityIdByName( core_google_geo::findCityName($lat, $long) ),
         );
-        return $data;
+
+        $user = new manage_model_user();
+        $user->load($data['imei'],'imei');
+        $data['user_id']=$user->getId();
+
+        return $data ;
     }
+
+    protected function _beforeSave(){
+        parent::_beforeSave();
+        if(!$this->getData('activity_id')){
+          throw new Exception('Activity is empty');
+        }
+        if(!$this->getData('city_id')){
+          throw new Exception('City is empty');
+        }
+        if(!$this->getData('user_id')){
+          throw new Exception('User is empty');
+        }
+        if(!$this->getData('date')){
+          throw new Exception('Date is empty');
+        }
+        if(!$this->getData('lat')){
+          throw new Exception('Lat is empty');
+        }
+        if(!$this->getData('long')){
+          throw new Exception('Long is empty');
+        }
+        return $this;
+    }
+
+
 
     protected function _getActivityIdByName( $activity_name ){
         $activity_model = new manage_model_activity();
         $activity_model->load(strtolower($activity_name),'name');
         if(!$activity_model->getId()){
-            $activity_model->setData('name',$activity_name)
+            $activity_model->setData('name',strtolower($activity_name))
                 ->save();
         }
         return $activity_model->getId();
@@ -189,7 +220,7 @@ class manage_model_event extends core_model{
 
     protected function _getCityIdByName( $city_name ){
         $activity_model = new manage_model_city();
-        $activity_model->load(mb_strtoupper($city_name),'name');
+        $activity_model->load(strtolower($city_name),'name');
         if(!$activity_model->getId()){
             $activity_model->setData('name',$city_name)
                 ->save();

@@ -5,9 +5,10 @@ class service_controller_api extends core_controller{
     public function getActivitiesAction(){
         $activity_model = new manage_model_activity();
         /** @var manage_model_activity_collection $ac */
-        $ac = $activity_model->getCollection();
+        $ac = $activity_model->getCollection()
+                ->activityReferenceForMobile();
         $ac->load();
-        echo service_helper_csv::arraysToCsv( $ac->toArray( ) );
+        echo service_helper_csv::arraysToCsv( $ac->toArray( false ) );
     }
 
     public function selectAction(){

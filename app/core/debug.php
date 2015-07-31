@@ -7,7 +7,7 @@ class core_debug {
         var_dump($var);
         echo '</pre>';
         $out = ob_get_contents();
-        ob_end_flush();
+        ob_end_clean();
         if($output){
             echo $out;
         }

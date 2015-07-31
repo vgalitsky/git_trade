@@ -11,7 +11,7 @@ class core_model extends core_db{
     /** @var  string */
     protected $_idfield;
     /** @var  array */
-    static $_describe;
+    protected $_describe;
 
     static $___id_field;
 
@@ -75,17 +75,17 @@ class core_model extends core_db{
      * @return array
      */
     public function describe(){
-        if(!self::$_describe){
+        if(!$this->_describe){
             $sql = "DESCRIBE {$this->_table}";
             /** @var PDOStatement $stmt */
             $stmt = $this->getConnection()->prepare( $sql );
             $stmt->execute();
             $columns = $stmt->fetchAll(PDO::FETCH_COLUMN);
             foreach($columns as $column){
-                self::$_describe[$column] = true;
+                $this->_describe[$column] = true;
             }
         }
-        return self::$_describe;
+        return $this->_describe;
     }
 
 
@@ -196,6 +196,7 @@ class core_model extends core_db{
                 continue;
             }
             if(!$this->hasField($field)){
+                die($field.'-no');
                 continue;
             }
             $set.="`{$field}`=:{$field}, ";
@@ -240,7 +241,7 @@ class core_model extends core_db{
      * @return bool
      */
     public function hasField( $field ){
-        $describe = self::$_describe;
+        $describe = $this->_describe;
         return isset($describe[$field]);
     }
 
