@@ -78,6 +78,10 @@ class core_block
         return isset($this->_vars[$var]) ? $this->_vars[$var] : null;
     }
 
+    public function v($var){
+        return $this->getVar($var);
+    }
+
     /**
      * @param string $block_name
      * @param core_block $block
@@ -153,6 +157,10 @@ class core_block
     {
         $path = core_str::applyVars($path, $vars);
         return $path;
+    }
+
+    public function l($string){
+        return $string;
     }
 
     static function getSkinDir($item, $mod = null)

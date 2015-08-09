@@ -1,0 +1,124 @@
+<?php
+
+/** @var core_block_messages $this */
+$messages = $this->getMessages();
+if(!is_array($messages) || !count($messages)){
+    return;
+}
+?>
+<style>
+    #core_messages{
+
+        position:absolute;
+        top:-20px;
+        left: 50%;
+
+        transform: translateX(-50%);
+        z-index:98;
+        -webkit-box-shadow: 0px 2px 10px 0px rgba(0,0,0,0.75);
+        -moz-box-shadow: 0px 2px 10px 0px rgba(0,0,0,0.75);
+        box-shadow: 0px 2px 10px 0px rgba(0,0,0,0.75);
+        /*
+        border:1px solid silver;
+        background-color: #FFB238;
+        padding:10px;
+        border-bottom-left-radius: 5px;
+        border-bottom-right-radius: 5px;
+        font-weight: 700;
+        font-size: 16px;
+        color:#fff;
+
+        */
+    }
+    #open_messages{
+        position:absolute;
+        top:-20px;
+        left: 50%;
+        transform: translateX(-50%);
+        cursor:pointer;
+        -webkit-box-shadow: 0px 2px 10px 0px rgba(0,0,0,0.75);
+        -moz-box-shadow: 0px 2px 10px 0px rgba(0,0,0,0.75);
+        box-shadow: 0px 2px 10px 0px rgba(0,0,0,0.75);
+        /*
+        border:1px solid silver;
+        background-color: #FFB238;
+        padding:10px;
+        border-bottom-left-radius: 5px;
+        border-bottom-right-radius: 5px;
+        font-weight: normal;
+        font-size: 16px;
+        color:#fff;
+       */
+    }
+</style>
+<div class="ui-widget" id="core_messages">
+    <div class="ui-state-highlight ui-corner-all" style="margin-top: 20px; padding: 0 .7em;">
+        <?php foreach( $messages as $k=>$message): ?>
+        <p><span class="ui-icon ui-icon-info" style="float: left; margin-right: .3em;"></span>
+            <strong></strong> <?php echo $this->seenMessage($k); ?></p>
+
+        <?php endforeach; ?>
+
+
+    </div>
+</div>
+
+<div id="open_messages" class="ui-widget" >
+    <div class="ui-state-highlight ui-corner-all" style="margin-top: 20px; padding: 0 .7em;">
+            <p><span class="ui-icon ui-icon-info" style="float: left; margin-right: .3em;"></span>
+                <strong></strong>
+                (<?php echo count($messages)?>)
+            </p>
+    </div>
+</div>
+<script>
+    $("#core_messages").mouseenter(function(){
+        clearTimeout($(this).data('timeoutId'));
+
+    }).mouseleave(function(){
+        hide_ses_msgs();
+    });
+
+    var hide_ses_msgs = function(){
+        var tid = setTimeout(function () {
+
+            $('#core_messages').slideUp();
+            $('#open_messages').slideDown();
+//            setTimeout(function(){
+//                $('#open_messages').slideUp();
+//            },15000);
+
+        }, 1500);
+        $('#core_messages').data('timeoutId', tid);
+    };
+    var show_ses_msgs = function(){
+        $('#core_messages').slideDown();
+        var tid = setTimeout(function () {
+            $('#core_messages').slideUp();
+        },5000);
+        $('#core_messages').data('timeoutId', tid);
+    };
+
+    (function($) {
+        hide_ses_msgs();
+        $('#open_messages').click(function() {
+         show_ses_msgs();
+        });
+
+//        setTimeout(function () {
+//            $('#core_messages').slideUp();
+//            $('#open_messages').slideDown();
+//            setTimeout(function(){
+//                $('#open_messages').slideUp();
+//            },10000);
+//
+//        }, 1500);
+//
+//        $('#open_messages').click(function(){
+//            $('#core_messages').slideDown();
+//            setTimeout(function () {
+//                $('#core_messages').slideUp();
+//            },5000);
+//        });
+    })(jQuery);
+</script>

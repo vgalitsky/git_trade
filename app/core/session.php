@@ -49,16 +49,42 @@ class core_session extends core_object{
         session_destroy();
     }
 
-    public function getLoggedInUser(){
+    public function getLoggedInUser( $model = null){
         if(!$this->getData('suid')){
             return false;
         }
         if(!self::$logged_in_user){
-            $user = new core_model_user();
+            if(!$model){
+                $model = new core_model_user();
+            }elseif( is_string($model)){
+                $model = new $model();
+            }
+            $model = new core_model_user();
+            $user = $model;
             $user->load($this->getData('suid'),'suid');
             self::$logged_in_user = $user;
         }
         return self::$logged_in_user;
+    }
+
+    public function addMessage($message){
+        $messages = $this->getData('_session_messages');
+        $messages = is_array($messages) ? $messages : array();
+        $messages[]=$message;
+        $this->setData('_session_messages',$messages);
+        return $this;
+    }
+
+    public function removeMessage($k){
+        $messages = $this->getData('_session_messages');
+        $msg = $messages[$k];
+        unset($messages[$k]);
+        $this->setData( '_session_messages', $messages );
+        return $msg;
+    }
+
+    public function getMessages(){
+        return $this->getData('_session_messages') ? $this->getData('_session_messages') : array();
     }
 
 }

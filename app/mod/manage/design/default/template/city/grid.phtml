@@ -4,7 +4,7 @@
         <tr>
             <th>ID</th>
             <th>Город</th>
-            <th>К-во событий</th>
+            <!--th>К-во событий</th-->
             <th></th>
         </tr>
     </thead>
@@ -14,7 +14,6 @@
         <td><?php echo $city->getData('name')?></td>
         <td align="right">
             <ul id="icons" class="ui-widget ui-helper-clearfix right">
-                <li onclick="cityManager.filterMap(<?php echo $city->getId()?>)" class="ui-state-default ui-corner-all" title="Фильтровать события для этого города на карте"><span class="ui-icon ui-icon-search"></span></li>
                 <li onclick="cityManager.getForm(<?php echo $city->getId()?>)" class="ui-state-default ui-corner-all" title="Изменить"><span class="ui-icon ui-icon-pencil"></span></li>
                 <li onclick="cityManager.deleteCity(<?php echo $city->getId()?>)" city_id="<?php echo $city->getId()?>" class="city-grid-delete ui-state-default ui-corner-all" title="Удалить"><span class="ui-icon ui-icon-trash"></span></li>
              </ul>

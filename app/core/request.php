@@ -75,8 +75,8 @@ class core_request {
         $request_uri = preg_replace('/\?.*/','',$request_uri);
         $parts = explode('/', $request_uri);
         $this->_mod = $parts[1];
-        $this->_controller = $parts[2];
-        $this->_action = (isset($parts[3]) && $parts[3]) ? $parts[3] : core_controller::DEFAULT_ACTION.core_controller::ACTION_SUFFIX;
+        $this->_controller = (isset($parts[2]) && $parts[2]) ? $parts[2] : core_controller::DEFAULT_CONTROLLER;
+        $this->_action = (isset($parts[3]) && $parts[3]) ? $parts[3] : core_controller::DEFAULT_ACTION;
         unset($parts[0],$parts[1], $parts[2],$parts[3]);
         $this->addRequestVars( $parts );
         return $this;
@@ -132,6 +132,26 @@ class core_request {
         return $this->_mod;
     }
 
+    public function getReferer(){
+        return $_SERVER["HTTP_REFERER"];
+    }
+
+    protected function  _url_origin($s, $use_forwarded_host=false)
+    {
+        $ssl = (!empty($s['HTTPS']) && $s['HTTPS'] == 'on') ? true:false;
+        $sp = strtolower($s['SERVER_PROTOCOL']);
+        $protocol = substr($sp, 0, strpos($sp, '/')) . (($ssl) ? 's' : '');
+        $port = $s['SERVER_PORT'];
+        $port = ((!$ssl && $port=='80') || ($ssl && $port=='443')) ? '' : ':'.$port;
+        $host = ($use_forwarded_host && isset($s['HTTP_X_FORWARDED_HOST'])) ? $s['HTTP_X_FORWARDED_HOST'] : (isset($s['HTTP_HOST']) ? $s['HTTP_HOST'] : null);
+        $host = isset($host) ? $host : $s['SERVER_NAME'] . $port;
+        return $protocol . '://' . $host;
+    }
+    function getRequestedUrl( $s = null, $use_forwarded_host=false)
+    {
+        $s = $s? $s : $this->getPart('server');
+        return $this->_url_origin($s, $use_forwarded_host) . $s['REQUEST_URI'];
+    }
 
 
 

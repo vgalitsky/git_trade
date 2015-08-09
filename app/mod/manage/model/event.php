@@ -1,5 +1,8 @@
 <?php
 class manage_model_event extends core_model{
+
+    static $grabtime;
+
     public function __construct(){
         parent::__construct('event','event_id');
     }
@@ -11,10 +14,12 @@ class manage_model_event extends core_model{
         $content_block = new map_block_map_marker_content();
         $content_block->setVar('event',$this);
         $this->setData('content', $content_block->getHtml() );
+
         return $this;
     }
 
     public function emailGrab(){
+        self::$grabtime = time();
         $inbox = imap_open('{imap.gmail.com:993/imap/ssl}INBOX', 'f.estelkontrol@gmail.com', 'f.estelkontrol07');
 
         /* get all new emails. If set to 'ALL' instead
@@ -42,10 +47,11 @@ class manage_model_event extends core_model{
 
                 /* get information specific to this email */
                 $overview = imap_fetch_overview($inbox, $email_number, 0);
-
+//core_debug::dump($overview);
 
                 /* get mail structure */
                 $structure = imap_fetchstructure($inbox, $email_number);
+//core_debug::dump($structure);
 
 
                 $attachments = array();
@@ -59,6 +65,7 @@ class manage_model_event extends core_model{
                             $bodyText = imap_fetchbody($inbox,$email_number,1);
                         }
                         $hinfo = imap_headerinfo($inbox,$email_number);
+//core_debug::dump($hinfo);
                         $subject = $hinfo->subject;
 
 
@@ -93,13 +100,18 @@ class manage_model_event extends core_model{
 
                         if ($attachments[$i]['is_attachment']) {
                             $attachments[$i]['attachment'] = imap_fetchbody($inbox, $email_number, $i + 1);
+                            //$attachments[$i]['csv'] = imap_fetchbody($inbox, $email_number, $i);
 
                             /* 3 = BASE64 encoding */
                             if ($structure->parts[$i]->encoding == 3) {
                                 $attachments[$i]['attachment'] = base64_decode($attachments[$i]['attachment']);
+                                $attachments[$i]['subject'] = base64_decode($attachments[$i]['subject']);
+                                $attachments[$i]['csv'] = base64_decode($attachments[$i]['csv']);
                             } /* 4 = QUOTED-PRINTABLE encoding */
                             elseif ($structure->parts[$i]->encoding == 4) {
                                 $attachments[$i]['attachment'] = quoted_printable_decode($attachments[$i]['attachment']);
+                                $attachments[$i]['subject'] = quoted_printable_decode($attachments[$i]['subject']);
+                                $attachments[$i]['csv'] = quoted_printable_decode($attachments[$i]['csv']);
                             }
                         }
                     }
@@ -108,7 +120,8 @@ class manage_model_event extends core_model{
                 /* iterate through each attachment and save it */
                 foreach ($attachments as $attachment) {
                     if ($attachment['is_attachment'] == 1) {
-                        core_log::log( "START: Processing email [{$attachment['email_number']}]: {$attachment['subject']} ({$attachment['date']})" ,'event.imap.log');
+                        $attachment['date'] = date('d.m.Y H:i:s', strtotime($attachment['date']));
+                        echo nl2br( core_log::log( "START: Processing email [{$attachment['email_number']}]: {$attachment['subject']} ({$attachment['date']})" ,self::$grabtime.'.event.imap.log'));
                         $filename = $attachment['name'];
                         if (empty($filename)) $filename = $attachment['filename'];
 
@@ -118,18 +131,22 @@ class manage_model_event extends core_model{
                          * have the attachment with the same file name.
                          */
                         try {
-                            $path = app::getConfig("dir/sd") . "event" . DS . "img"
-                                . DS . uniqid(time() . '-') . "-" . $filename;
+                            $rpath = "event" . DS . "img" . DS . uniqid(time() . '-') . "-" . $filename;
+                            $path = app::getConfig("dir/sd") . $rpath;
                             core_fs::createDirIfNotExists(dirname($path));
                             $fp = fopen($path, "w+");
                             fwrite($fp, $attachment['attachment']);
                             fclose($fp);
 
-                            $attachment['full_filename'] = $path;
+                            $attachment['full_filename'] = $rpath;
                             $event = $this->_email2event($attachment);
-                            core_log::log( "DONE: ID={$event->getId()} ({$path})" ,'event.imap.log');
+                            echo nl2br( core_log::log( "DONE: ID={$event->getId()} ({$path})" ,self::$grabtime.'.event.imap.log') );
                         }catch(Exception $e){
-                            core_log::log( "ERROR: {$e->getMessage()}" ,'event.imap.log');
+                            $a = $attachment;
+                            unset($a['attachment']);
+                            $data = core_debug::dump($a);
+                            echo nl2br( core_log::log( "ERROR: {$e->getMessage()} " ,self::$grabtime.'.event.imap.log') );
+                            echo nl2br( core_log::log( "DATA: {$data}" ,self::$grabtime.'.event.imap.log') );
                         }
 
                     }
@@ -149,7 +166,8 @@ class manage_model_event extends core_model{
 
         $eventData = array_merge(
             array(
-            'image' => app::getUrl($email['full_filename']),
+            'email_number' => $email['email_number'],
+            'image' => 'sd/'.$email['full_filename'],
             ),
             $bodyData
         );
@@ -163,25 +181,40 @@ class manage_model_event extends core_model{
     protected function _pareseEmailBodyCsv($csv){
         $csv = strip_tags(html_entity_decode(trim(str_replace("\n",'',str_replace("\r",'',$csv)))));
         $array = str_getcsv($csv,';');
-
+        if(!is_array($array)){
+            throw new Exception('Error while parsing email body' );
+        }
         $lat = $array[1];
         $long = $array[2];
 
         $data = array(
             'imei'      => $array[0],
+            'user_id'   => $this->_getUserByImei($array[0]),
             'lat'       => $lat,
             'long'      => $long,
             'date'      => $array[3],
-            'activity_id'  => $array[4],//$this->_getActivityIdByName( $array[4] ),
+            'activity_id'  => $this->_getActivityIdByName( $array[4] ),
             'city_id'  => $this->_getCityIdByName( core_google_geo::findCityName($lat, $long) ),
         );
 
-        $user = new manage_model_user();
-        $user->load($data['imei'],'imei');
-        $data['user_id']=$user->getId();
 
         return $data ;
     }
+
+    protected function _getUserByImei( $imei ){
+        $user = new manage_model_user();
+        $user->load($imei,'imei');
+        if(!$user->getId()){
+            $user->setData('imei',$imei);
+            $user->setData('role_id', manage_model_role::ROLE_AGENT);
+            $user->setData('username', $imei);
+            $user->setData('fullname', $imei);
+            $user->setData('marker_color', '#ff0000');
+            $user->save();
+        }
+        return $user->getId();
+    }
+
 
     protected function _beforeSave(){
         parent::_beforeSave();
@@ -203,6 +236,25 @@ class manage_model_event extends core_model{
         if(!$this->getData('long')){
           throw new Exception('Long is empty');
         }
+
+        $this->_applyUserColor()
+            ->_validDate();
+        return $this;
+    }
+
+    protected function _validDate(){
+        //echo $this->getData('date');
+        if(!is_numeric($this->getData('date'))){
+            $this->setData('date', strtotime($this->getData('date')) );
+        }
+        //echo '<br/>'.date('d-m-Y H:i',$this->getData('date')).'<hr>';
+        return $this;
+    }
+
+    protected function _applyUserColor(){
+        $user = new manage_model_user();
+        $user->load( $this->getData('user_id') );
+        $this->setData('marker_color',$user->getData('marker_color'));
         return $this;
     }
 

@@ -8,6 +8,7 @@ class core_block_page extends core_block{
         parent::__construct( self::DEFAULT_PAGE );
         $this->addChild('head', new core_block_head());
         $this->addChild('header', new core_block_header());
+        $this->addChild('messages', new core_block_messages());
         $this->addChild('footer', new core_block_footer());
     }
 }

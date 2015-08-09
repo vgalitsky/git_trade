@@ -8,7 +8,13 @@ class service_controller_api extends core_controller{
         $ac = $activity_model->getCollection()
                 ->activityReferenceForMobile();
         $ac->load();
-        echo service_helper_csv::arraysToCsv( $ac->toArray( false ) );
+
+        $ftmp = fopen('php://output', 'w');
+        $activities = $ac->toArray( false );
+        foreach($activities as $activity){
+            fputcsv($ftmp,$activity);
+        }
+        fclose($ftmp);
     }
 
     public function selectAction(){

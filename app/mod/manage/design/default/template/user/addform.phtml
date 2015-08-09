@@ -44,20 +44,32 @@ $managers = $this->getVar('managers');
                 </select>
             </td>
         </tr>
+        <tr id="user-form-marker-color" class="<?php if($user->getId() && $user->getData('role_id')!=manage_model_role::ROLE_AGENT) echo 'hidden' ?>">
+            <td>Цвет маркера</td>
+            <td>
+                <input type="color" name="user[marker_color]" value="<?php echo $user->getData('marker_color') ?>"/>
+            </td>
+        </tr>
     </table>
 </form>
 <script>
     (function($){
+
+
+
         $('select[name=user\\[parent_id\\]]').val('<?php echo $user->getData('parent_id') ?>');
         $('select[name=user\\[role_id\\]]').val('<?php echo $user->getData('role_id') ?>');
 
         $('select[name=user\\[role_id\\]]').on('change',function(){
             if($(this).val()!=='<?php echo manage_model_role::ROLE_AGENT ?>'){
                 $('#user-form-parent-id').hide();
+                $('#user-form-marker-color').hide();
             }else{
                 $('#user-form-parent-id').show();
+                $('#user-form-marker-color').show();
             }
         });
         $('#add-dialog-user').dialog({title: '<?php echo $user->getData('fullname'); ?>'});
+
     })(jQuery);
 </script>

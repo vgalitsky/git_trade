@@ -2,6 +2,7 @@
 class core_controller {
     const DIR = 'controller';
 
+    const DEFAULT_CONTROLLER = 'index';
     const DEFAULT_ACTION = 'index';
     const ACTION_SUFFIX = 'Action';
 
@@ -52,13 +53,13 @@ class core_controller {
 
     /**
      * @return $this
-     * @throws Exception
+     * @throws core_exception
      */
     public function dispatchAction( ){
         $action = $this->getRequest()->getActionName();
         $actionMethod = $action.self::ACTION_SUFFIX;
         if(!method_exists($this,$actionMethod)){
-            throw new Exception("Controller action {$actionMethod} not found");
+            throw new core_exception("Controller action {$actionMethod} not found");
         }
         $this->_actionMethod = $actionMethod;
         $this->_predispatchAction();
@@ -71,7 +72,12 @@ class core_controller {
         return $this;
     }
 
-    static function okJson($data){
+    protected function _redirect($url){
+        header("Location: {$url}");
+        die();
+    }
+
+    static function okJson($data=null){
         return json_encode(array('ok'=>true,'data'=>$data));
     }
 

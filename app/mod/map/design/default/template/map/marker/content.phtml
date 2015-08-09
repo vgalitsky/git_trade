@@ -13,7 +13,7 @@ $event = $this->getVar('event');
             <li><a href="#tab-data">Данные</a></li>
         </ul>
         <div id="tab-image" class="tab">
-            <img width="370px" src="<?php echo app::getUrl('sd/event/event.jpg') ?>"/>
+            <img width="370px" src="<?php echo $this->getUrl($event->getData('image')); ?>"/>
         </div>
         <div id="tab-data" class="marker-data tab" >
             <table class="info-table">

@@ -71,6 +71,10 @@ class core_model extends core_db{
         $this->setData($this->getIdField(),$id);
     }
 
+    protected function _validateData(){
+        return $this;
+    }
+
     /**
      * @return array
      */
@@ -88,17 +92,13 @@ class core_model extends core_db{
         return $this->_describe;
     }
 
-
-
-
-
     /**
      * @param $var
      * @param $val
      * @return $this
      */
     public function setData( $var , $val =null){
-        if(!$val){
+        if(is_array($var) && !$val ){
             $this->_data = $var;
             return $this;
         }
@@ -117,6 +117,22 @@ class core_model extends core_db{
         return isset($this->_data[$var]) ? $this->_data[$var] : null;
     }
 
+    /**
+     * @param $var
+     * @param null $value
+     * @return array|core_model|null
+     */
+    public function data( $var, $value=null ){
+        if($value || is_array($var)){
+            return $this->setData( $var, $value );
+        }
+        return $this->getData($var);
+    }
+
+    /**
+     * @param $var
+     * @return $this
+     */
     public function unsetData($var){
         if(isset($this->_data[$var])){
             unset($this->_data[$var]);
@@ -124,16 +140,26 @@ class core_model extends core_db{
         return $this;
     }
 
+    /**
+     * @param $data
+     * @return $this
+     */
     public function setOrigData($data){
         $this->_origData = $data;
         return $this;
     }
 
+    /**
+     * @return array
+     */
     public function getOrigData(){
         return $this->_origData;
     }
 
-    protected function _beforeSave(){ return $this;}
+    protected function _beforeSave(){
+        $this->_validateData();
+        return $this;
+    }
     protected function _afterSave(){return $this;}
 
     /**
@@ -141,7 +167,9 @@ class core_model extends core_db{
      */
     public function save(){
         $this->_beforeSave();
-        if($this->getId()){
+
+        if($this->getId() && $this->_exists()){
+
             $this->_saveExists();
         }else{
             $this->_create();
@@ -149,6 +177,16 @@ class core_model extends core_db{
 
         $this->_afterSave();
         return $this;
+    }
+
+    public function _exists(){
+        $sql = "SELECT {$this->getIdField()} FROM {$this->getTable()} WHERE {$this->getIdField()}=:id";
+        $stmt = $this->getConnection()->prepare( $sql );
+        //echo get_called_class();
+        $stmt->execute(array('id'=>$this->getId()));
+        /** @var array $data */
+        $data = $stmt->fetch();
+        return $data[$this->getIdField()];
     }
 
     /**
@@ -190,13 +228,16 @@ class core_model extends core_db{
     protected function _create(){
         $values = array();
         $set = '';
+        if(!is_array($this->getData())){
+            $cc = get_called_class();
+            throw new core_exception("Can`t create model with empty data ({$cc})");
+        }
         foreach( $this->getData() as $field=>$value){
 
             if($field === $this->getIdField()){
                 continue;
             }
             if(!$this->hasField($field)){
-                die($field.'-no');
                 continue;
             }
             $set.="`{$field}`=:{$field}, ";
@@ -217,6 +258,9 @@ class core_model extends core_db{
      * @return bool
      */
     public function hasChanges(){
+        if(!is_array($this->_origData)){
+            return true;
+        }
         foreach($this->_origData as $field=>$value){
             if( $value !== $this->getData($field) ){
                 return true;
@@ -264,7 +308,6 @@ class core_model extends core_db{
         $stmt->execute(array('value'=>$value));
         /** @var array $data */
         $data = $stmt->fetch();
-
         //do not use numeric index
 //        foreach( $data as $k=>$value){
 //            if(is_numeric($k)){
@@ -282,7 +325,7 @@ class core_model extends core_db{
 
     public function delete(){
         if(!$this->getId()){
-            throw new Exception('Id was not given');
+            throw new core_exception('Id was not given');
         }
         $sql = "DELETE FROM {$this->getTable()} WHERE {$this->getIdField()}=:value";
         /** @var PDOStatement $stmt */

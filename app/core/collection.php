@@ -137,6 +137,18 @@ class core_collection implements IteratorAggregate, Countable{
         return $this;
     }
 
+    public function addColumnFilter($column,$value, $cond='='){
+        $uniqidval = uniqid('val_');
+        $sql = $this->getSql();
+        if(!stristr($sql,'where')){
+            $sql .= "WHERE 1";
+        }
+        $sql.= "AND ({$column} {$cond} :{$uniqidval})";
+        $this->setSqlValue($uniqidval, $value);
+        $this->setSql( $sql );
+        return $this;
+    }
+
     /**
      * @param bool|true $use_id_as_key
      * @return array

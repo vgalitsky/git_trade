@@ -9,7 +9,7 @@ $collection->load();
         <tr>
             <th>ID</th>
             <th>Активность</th>
-            <th>К-во событий</th>
+            <!--th>К-во событий</th-->
             <th></th>
         </tr>
     </thead>
@@ -17,10 +17,9 @@ $collection->load();
     <tr activity_id="<?php echo $activity->getId()?>">
         <td><?php echo $activity->getId()?></td>
         <td><?php echo $activity->getData('name')?></td>
-        <td><?php echo $activity->getData('events_sum')?></td>
+        <!--td><?php echo $activity->getData('events_sum')?></td-->
         <td>
             <ul id="icons" class="ui-widget ui-helper-clearfix right">
-                <li onclick="activityManager.filterMap(<?php echo $activity->getId()?>)" class="ui-state-default ui-corner-all" title="Фильтровать события для этой активности на карте"><span class="ui-icon ui-icon-search"></span></li>
                 <li onclick="activityManager.getForm(<?php echo $activity->getId()?>)" class="ui-state-default ui-corner-all" title="Изменить"><span class="ui-icon ui-icon-pencil"></span></li>
                 <li onclick="activityManager.deleteactivity(<?php echo $activity->getId()?>)" activity_id="<?php echo $activity->getId()?>" class="activity-grid-delete ui-state-default ui-corner-all" title="Удалить"><span class="ui-icon ui-icon-trash"></span></li>
              </ul>
