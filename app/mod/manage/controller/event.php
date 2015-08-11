@@ -28,4 +28,11 @@ class manage_controller_event extends manage_controller_manage
         die('at ctrl');
     }
 
+    public function deleteAction(){
+        $event_id = $this->getRequest()->getParam('event_id');
+        $event = new manage_model_event();
+        $event->load($event_id);
+        $event->delete();
+    }
+
 }

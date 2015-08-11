@@ -3,6 +3,12 @@
 /** @var manage_model_event $event */
 $event = $this->getVar('event');
 ?>
+<style>
+    .tab{
+        height:206px;
+        width:368px;
+    }
+</style>
 <div class="marker-content">
     <h1><?php echo $event->getData('title') ?></h1>
 
@@ -11,12 +17,13 @@ $event = $this->getVar('event');
         <ul style="font-size:10px;">
             <li><a href="#tab-image">Изображение</a></li>
             <li><a href="#tab-data">Данные</a></li>
+            <li><a href="#tab-tool">Управление</a></li>
         </ul>
         <div id="tab-image" class="tab">
             <img width="370px" src="<?php echo $this->getUrl($event->getData('image')); ?>"/>
         </div>
         <div id="tab-data" class="marker-data tab" >
-            <table class="info-table">
+            <table class="info-table" width="370px" height="206">
                 <tr>
                     <td>Дата, время</td>
                     <td><?php echo date('d.m.Y H:i', $event->getData('date')) ?></td>
@@ -34,6 +41,9 @@ $event = $this->getVar('event');
                     <td><?php echo $event->getData('activity_name') ?></td>
                 </tr>
             </table>
+        </div>
+        <div id="tab-tool" class="tab" >
+            <button class="button-event-delete" event_id="<?php echo $event->getId() ?>" onclick="gisTrade.deleteEvent('<?php echo $event->getId() ?>')">Удалить</button>
         </div>
 
     </div>

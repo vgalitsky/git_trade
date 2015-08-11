@@ -33,9 +33,11 @@ class map_controller_index extends map_controller_requirelogin{
                 'activity_id'=> $a,
                 'city_id'=> $c,
                 'date' => strtotime(rand(1,29).'.'.rand(1,7).'.'.'2015'),
+                'marker_color' => '#efefef',
 
             );
             $e->setData($data);
+            core_debug::dump($e);
             $e->save();
         }
     }

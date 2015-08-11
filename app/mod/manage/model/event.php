@@ -31,7 +31,7 @@ class manage_model_event extends core_model{
         $emails = imap_search($inbox, 'UNSEEN');
 
         /* useful only if the above search is set to 'ALL' */
-        $max_emails = 16;
+        $max_emails = 100;
 
 
         /* if any emails found, iterate through each email */
@@ -76,8 +76,10 @@ class manage_model_event extends core_model{
                             'filename' => '',
                             'name' => '',
                             'attachment' => '',
+
                             'subject' => imap_utf8($subject),
                             'csv' => imap_utf8($bodyText),
+                            'csv_orig' => $bodyText
                         );
 
                         if ($structure->parts[$i]->ifdparameters) {
@@ -105,13 +107,13 @@ class manage_model_event extends core_model{
                             /* 3 = BASE64 encoding */
                             if ($structure->parts[$i]->encoding == 3) {
                                 $attachments[$i]['attachment'] = base64_decode($attachments[$i]['attachment']);
-                                $attachments[$i]['subject'] = base64_decode($attachments[$i]['subject']);
-                                $attachments[$i]['csv'] = base64_decode($attachments[$i]['csv']);
+                               // $attachments[$i]['subject'] = base64_decode($attachments[$i]['subject']);
+                               // $attachments[$i]['csv'] = base64_decode($attachments[$i]['csv']);
                             } /* 4 = QUOTED-PRINTABLE encoding */
                             elseif ($structure->parts[$i]->encoding == 4) {
                                 $attachments[$i]['attachment'] = quoted_printable_decode($attachments[$i]['attachment']);
-                                $attachments[$i]['subject'] = quoted_printable_decode($attachments[$i]['subject']);
-                                $attachments[$i]['csv'] = quoted_printable_decode($attachments[$i]['csv']);
+                               // $attachments[$i]['subject'] = quoted_printable_decode($attachments[$i]['subject']);
+                               // $attachments[$i]['csv'] = quoted_printable_decode($attachments[$i]['csv']);
                             }
                         }
                     }
@@ -144,7 +146,7 @@ class manage_model_event extends core_model{
                         }catch(Exception $e){
                             $a = $attachment;
                             unset($a['attachment']);
-                            $data = core_debug::dump($a);
+                            $data = core_debug::dump($a,false);
                             echo nl2br( core_log::log( "ERROR: {$e->getMessage()} " ,self::$grabtime.'.event.imap.log') );
                             echo nl2br( core_log::log( "DATA: {$data}" ,self::$grabtime.'.event.imap.log') );
                         }
@@ -162,7 +164,7 @@ class manage_model_event extends core_model{
 
     protected function _email2event( $email ){
 
-        $bodyData = $this->_pareseEmailBodyCsv( $email['csv'] );
+        $bodyData = $this->_pareseEmailBodyCsv( $email['csv'], $email['csv_orig'] );
 
         $eventData = array_merge(
             array(
@@ -178,12 +180,43 @@ class manage_model_event extends core_model{
         return $event;
     }
 
-    protected function _pareseEmailBodyCsv($csv){
-        $csv = strip_tags(html_entity_decode(trim(str_replace("\n",'',str_replace("\r",'',$csv)))));
+
+    /**
+     * FUCKING SHIT FUNCTION . SORRY FOR THS FUCK
+     * @param $csv
+     * @param $orig
+     * @return array
+     * @throws Exception
+     */
+    protected function _pareseEmailBodyCsv($csv, $orig){
+
+        //$orig = $this->_prepareCsvString($csv);
+        $csv = $this->_prepareCsvString($csv);
+        core_debug::dump($csv);
         $array = str_getcsv($csv,';');
-        if(!is_array($array)){
+
+        if(!is_array($array) || !isset($array[0]) || !isset($array[1]) || !isset($array[2]) || !isset($array[3]) || !isset($array[4]) ){
+            $csv = $this->tryEncodeUtf8($orig);
+            $csv = $this->_prepareCsvString($csv);
+            core_debug::dump($csv);
+            $array = str_getcsv($csv,';');
+        }
+        if(!is_array($array) || !isset($array[0]) || !isset($array[1]) || !isset($array[2]) || !isset($array[3]) || !isset($array[4]) ){
+            $csv = $this->tryEncodebase64($orig);
+            $csv = $this->_prepareCsvString($csv);
+            core_debug::dump($csv);
+            $array = str_getcsv($csv,';');
+        }
+
+
+        if(!is_array($array) || !isset($array[0]) || !isset($array[1]) || !isset($array[2]) || !isset($array[3]) || !isset($array[4]) ){
             throw new Exception('Error while parsing email body' );
         }
+
+
+
+//      core_debug::dump($csv);
+        core_debug::dump($array);
         $lat = $array[1];
         $long = $array[2];
 
@@ -192,13 +225,43 @@ class manage_model_event extends core_model{
             'user_id'   => $this->_getUserByImei($array[0]),
             'lat'       => $lat,
             'long'      => $long,
-            'date'      => $array[3],
+            'date'      => $array[3]/1000,
             'activity_id'  => $this->_getActivityIdByName( $array[4] ),
             'city_id'  => $this->_getCityIdByName( core_google_geo::findCityName($lat, $long) ),
         );
 
 
         return $data ;
+    }
+
+    protected function tryEncodeUtf8( $text ){
+        return imap_utf8($text);
+    }
+
+    protected function tryEncodebase64( $text ){
+        return base64_decode($text);
+    }
+
+
+
+    protected function _prepareCsvString( $csv ){
+        $csv = html_entity_decode($csv);
+
+        $csv = strip_tags($csv);
+
+        $csv = preg_replace('/"^/','',$csv);
+        $csv = preg_replace('/"$/','',$csv);
+        $csv = preg_replace("/\n.*/",'',$csv);
+        $csv = str_replace('"','',$csv);
+
+        $csv = htmlentities($csv);
+        $csv = trim($csv);
+       // $csv = str_replace("\r",'',$csv);
+       // $csv = str_replace("\n",',',$csv);
+
+
+
+        return $csv;
     }
 
     protected function _getUserByImei( $imei ){
@@ -261,6 +324,11 @@ class manage_model_event extends core_model{
 
 
     protected function _getActivityIdByName( $activity_name ){
+        $activity_name = urldecode($activity_name);
+        $activity_name = html_entity_decode($activity_name);
+        $activity_name = htmlspecialchars_decode($activity_name);
+        //$activity_name = preg_replace('/[,\.\/]/','',$activity_name);
+
         $activity_model = new manage_model_activity();
         $activity_model->load(strtolower($activity_name),'name');
         if(!$activity_model->getId()){

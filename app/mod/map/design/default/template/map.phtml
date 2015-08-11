@@ -121,7 +121,9 @@
             google.maps.event.addListener(marker, 'click', function () {
 
 //                infoBubble.open(gisTrade.map,marker);
+                //infowindow.close();
                 infowindow.open(gisTrade.map, marker);
+                marker.iw=infowindow
             });
             google.maps.event.addListener(gisTrade.map, 'click', function () {
                 infowindow.close();
@@ -133,9 +135,17 @@
                 gisTrade.activityMarkers[i].setMap(show ? gisTrade.map : null);
             }
         },
-        deleteActivityMarker: function (marker, index) {
-            gisTrade.activityMarkers[index].setMap(null);
-            gisTrade.activityMarkers[index] = null;
+        deleteActivityMarker: function ( event_id ) {
+            for( var index in gisTrade.activityMarkers) {
+                var m = gisTrade.activityMarkers[index];
+                if(!m)continue;
+                if (m.___data.origData.event_id == event_id) {
+                    m.iw.close();
+                    m.setMap(null);
+                    gisTrade.activityMarkers[index] = null;
+                    return;
+                }
+            }
         },
         showMarker: function (marker) {
             marker.setMap(gisTrade.map);
@@ -216,6 +226,14 @@
                 }
             }
             gisTrade.updateMarkerCluster();
+        },
+        deleteEvent: function( event_id){
+            $.ajax({
+                url: '<?php echo $this->getUrl('manage/event/delete') ?>',
+                data:{event_id:event_id},
+            });
+            gisTrade.deleteActivityMarker(event_id);
+
         }
     };
 
