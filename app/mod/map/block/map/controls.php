@@ -32,7 +32,7 @@ class map_block_map_controls extends core_block
 
         $this->setVar('traders', $traders_collection);
 
-        $dateFrom = date('U')-60*60*24*30;
+        $dateFrom = date('U')-60*60*24*7;
         $dateTo = (int)date('U');
         $this->setFilterVar('date',array('from'=>$dateFrom,'to'=>$dateTo));
     }
