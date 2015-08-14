@@ -10,6 +10,7 @@ class manage_controller_event extends manage_controller_manage
             $events = app::getModel('manage_model_event')->getCollection();
 
             $events->prepareFilter($filter);
+            //die($events->getSql());
             $events->load();
             $events_array = $events->toArray();
             $json = self::okJson($events_array);

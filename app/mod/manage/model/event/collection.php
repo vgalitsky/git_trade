@@ -13,7 +13,7 @@ class manage_model_event_collection extends core_collection{
                 city.city_id as city_id, city.name as city_name,
                 activity.activity_id as activity_id, activity.name as activity_name
               FROM `{$this->getTable()}` as event
-              RIGHT JOIN user ON event.user_id=user.user_id {$parent_where}
+              INNER JOIN user ON event.user_id=user.user_id {$parent_where}
               LEFT JOIN city ON event.city_id=city.city_id
               LEFT JOIN activity ON event.activity_id=activity.activity_id
               WHERE 1 ";

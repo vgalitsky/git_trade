@@ -87,8 +87,9 @@
             });*/
 
 
-            gisTrade.showActivityMarkers(true);
-            setTimeout(function(){gisTrade.filterMarkers()},1000);
+            //gisTrade.showActivityMarkers(true);
+            //gisTrade.filterMarkers();
+            //setTimeout(function(){gisTrade.filterMarkers()},100);
         },
         addActivityMarker: function (markerData) {
             var pinColor = markerData.marker_color ? markerData.marker_color : 'FE7569';
@@ -129,6 +130,7 @@
                 infowindow.close();
             });
             gisTrade.activityMarkers.push(marker);
+            gisTrade.filterMarkers();
         },
         showActivityMarkers: function (show) {
             for (var i = 0; i < gisTrade.activityMarkers.length; i++) {
@@ -189,17 +191,19 @@
                         }
                          gisTrade.updateMarkerCluster();
                     }
-                    var markers = gisTrade.activityMarkers;
-                    var bounds = new google.maps.LatLngBounds();
-                    for(i=0;i<markers.length;i++) {
-                        bounds.extend(markers[i].getPosition());
-                    }
-
-                    gisTrade.map.fitBounds(bounds);
+                   gisTrade.zoomMapToVisible();
                 }
             })
         },
+        zoomMapToVisible: function(){
+            var markers = gisTrade.activityMarkers;
+            var bounds = new google.maps.LatLngBounds();
+            for(i=0;i<markers.length;i++) {
+                bounds.extend(markers[i].getPosition());
+            }
 
+            gisTrade.map.fitBounds(bounds);
+        },
         filterMarkers: function () {
             for (var i in gisTrade.activityMarkers) {
                 var marker = gisTrade.activityMarkers[i];
@@ -226,6 +230,7 @@
                 }
             }
             gisTrade.updateMarkerCluster();
+            setTimeout(function(){gisTrade.zoomMapToVisible()},1000);
         },
         deleteEvent: function( event_id){
             $.ajax({
