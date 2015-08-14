@@ -33,7 +33,7 @@ class manage_model_event_collection extends core_collection{
 
     public function addDateFilter( $date ){
         $date_from = strtotime($date['from']);
-        $date_to = strtotime($date['to']);
+        $date_to = strtotime($date['to'])+60*60*24;
         $this->setSqlValue('date_from',$date_from);
         $this->setSqlValue('date_to',$date_to);
 
