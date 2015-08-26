@@ -17,7 +17,7 @@ class core_google_geo extends core_object{
 
         // If Status Code is ZERO_RESULTS, OVER_QUERY_LIMIT, REQUEST_DENIED or INVALID_REQUEST
         if ($response['status'] != 'OK') {
-            return $city_name;
+            return false;
         }
         //core_debug::dump($response[]);
         foreach( $response['results'][0]['address_components'] as $component){

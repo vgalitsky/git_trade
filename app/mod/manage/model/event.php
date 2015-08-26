@@ -215,14 +215,24 @@ class manage_model_event extends core_model{
         $lat = $array[1];
         $long = $array[2];
 
+        $user_id = $this->_getUserByImei($array[0]);
+        $user = new manage_model_user();
+        $user->load($user_id);
+        $city_name = core_google_geo::findCityName($lat, $long);
+        if(!$city_name){
+            $city_id = $user->getData('city_id');
+        }else {
+            $city_id = $this->_getCityIdByName($city_name);
+        }
+
         $data = array(
             'imei'      => $array[0],
-            'user_id'   => $this->_getUserByImei($array[0]),
+            'user_id'   => $user_id,
             'lat'       => $lat,
             'long'      => $long,
             'date'      => $array[3]/1000,
             'activity_id'  => $array[4],//$this->_getActivityIdByName( $array[4] ),
-            'city_id'  => $this->_getCityIdByName( core_google_geo::findCityName($lat, $long) ),
+            'city_id'  => $city_id,
         );
 
 
@@ -336,13 +346,13 @@ class manage_model_event extends core_model{
     }
 
     protected function _getCityIdByName( $city_name ){
-        $activity_model = new manage_model_city();
-        $activity_model->load(strtolower($city_name),'name');
-        if(!$activity_model->getId()){
-            $activity_model->setData('name',$city_name)
+        $city_model = new manage_model_city();
+        $city_model->load(strtolower($city_name),'name');
+        if(!$city_model->getId()){
+            $city_model->setData('name',$city_name)
                 ->save();
         }
-        return $activity_model->getId();
+        return $city_model->getId();
     }
 
 }

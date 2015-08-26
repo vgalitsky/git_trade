@@ -2,8 +2,10 @@
 /** @var manage_model_user $user */
 $user = $this->getVar('user');
 
-/** @var manage_model_user_collection $user */
+/** @var manage_model_user_collection $managers */
 $managers = $this->getVar('managers');
+/** @var manage_model_city_collection $cities */
+$cities = $this->getVar('cities');
 ?>
 <form id="add-user-form" action="<?php $this->getUrl('manage/user/save/ajax/1') ?>" method="POST" onsubmit="return false;">
     <input type="hidden" name="user[user_id]" value="<?php echo $user->getId()?>" />
@@ -45,7 +47,7 @@ $managers = $this->getVar('managers');
             </td>
         </tr>
         <tr id="user-form-city-id" class="<?php if($user->getId() && $user->getData('role_id')!=manage_model_role::ROLE_AGENT) echo 'hidden' ?>">
-            <td>Менеджер</td>
+            <td>Город</td>
             <td>
                 <select name="user[city_id]" value="<?php $user->getData('city_id') ?>">
                     <?php foreach($cities as $city):?>
@@ -74,8 +76,10 @@ $managers = $this->getVar('managers');
         $('select[name=user\\[role_id\\]]').on('change',function(){
             if($(this).val()!=='<?php echo manage_model_role::ROLE_AGENT ?>'){
                 $('#user-form-parent-id').hide();
+                $('#user-form-city-id').hide();
                 $('#user-form-marker-color').hide();
             }else{
+                $('#user-form-city-id').show();
                 $('#user-form-parent-id').show();
                 $('#user-form-marker-color').show();
             }
