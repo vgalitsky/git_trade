@@ -19,6 +19,8 @@ class map_controller_requirelogin extends core_controller{
             if(!$logged_in){
 
                 $this->_actionMethod = 'requireLoginAction';
+            }else{
+
             }
         }
     }

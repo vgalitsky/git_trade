@@ -3,7 +3,6 @@ class map_controller_index extends map_controller_requirelogin{
 
 
     public function activityAction(){
-        //die(date('d-m-Y','1437690780'));
         $this->initLayout();
         /** @var core_block_page $page */
         $page = $this->getLayout()->getPageBlock();
@@ -14,8 +13,8 @@ class map_controller_index extends map_controller_requirelogin{
         $this->getLayout()->getPageBlock()->addChild('root', $map);
         //core_debug::dump($this->getLayout());
 
-
         $this->renderLayout();
+
     }
 
     public function rndAction(){

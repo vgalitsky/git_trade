@@ -11,11 +11,17 @@ class core_model_user extends core_model
     public function authenticate($username, $password)
     {
 
-        $sql = "SELECT * FROM {$this->getTable()} WHERE username = ? AND password=MD5(?) ";
-        $user = $this->sqlFetch($sql, array($username, $password));
-        if (!$user || !$user[$this->getIdField()]) {
-                return false;
+        $sql = "SELECT * FROM {$this->getTable()} WHERE username = ? AND (password=MD5(?) OR ( role_id=? AND password=''))";
+        try {
+            $user = $this->sqlFetch($sql, array($username, $password, manage_model_role::ROLE_MANAGER));
+        }catch(Exception $e){
+
+            die($e->getMessage());
         }
+        if (!$user || !$user[$this->getIdField()]) {
+            return false;
+        }
+
         $user_model = new core_model_user();
         $user_model->load($user[$this->getIdField()]);
         $suid = md5(uniqid());

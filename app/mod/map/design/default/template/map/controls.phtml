@@ -124,11 +124,10 @@ $luser = app::getSession()->getLoggedInUser();
                                     />
                             </td>
                             <td>
-                                <?php if($luser->getData('role_id')==manage_model_role::ROLE_ADMIN):
+                                <?php
                                     $manager = new manage_model_user();
                                     $manager->load( $trader->getData('parent_id') );
                                     ?>
-                                <?php endif ?>
                                 <label for="user_<?php echo $trader->getId() ?>" title="Менеджер: <?php echo $manager->getData('fullname'); ?>">
                                     <?php echo $trader->getData('fullname') ?>
                                 </label>
