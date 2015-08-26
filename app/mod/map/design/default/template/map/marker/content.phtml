@@ -20,7 +20,7 @@ $event = $this->getVar('event');
             <li><a href="#tab-tool">Управление</a></li>
         </ul>
         <div id="tab-image" class="tab">
-            <img width="370px" src="<?php echo $this->getUrl($event->getData('image')); ?>"/>
+           <a target="_blank" href="<?php echo $this->getUrl($event->getData('image')); ?>"> <img width="360px" src="<?php echo $this->getUrl($event->getData('image')); ?>"/></a>
         </div>
         <div id="tab-data" class="marker-data tab" >
             <table class="info-table" width="370px" height="206">
