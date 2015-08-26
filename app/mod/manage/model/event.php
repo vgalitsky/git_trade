@@ -192,9 +192,7 @@ class manage_model_event extends core_model{
 
         //$orig = $this->_prepareCsvString($csv);
         $csv = $this->_prepareCsvString($orig);
-        core_debug::dump($csv);
-        die();
-        $array = str_getcsv($csv,';');
+        $array = explode(';',$csv);
 
         if(!is_array($array) || !isset($array[0]) || !isset($array[1]) || !isset($array[2]) || !isset($array[3]) || !isset($array[4]) ){
             $csv = $this->tryEncodeUtf8($orig);
@@ -210,15 +208,10 @@ class manage_model_event extends core_model{
             $array = str_getcsv($csv,';');
         }
 
-die();
         if(!is_array($array) || !isset($array[0]) || !isset($array[1]) || !isset($array[2]) || !isset($array[3]) || !isset($array[4]) ){
             throw new Exception('Error while parsing email body' );
         }
 
-
-
-//      core_debug::dump($csv);
-        core_debug::dump($array);
         $lat = $array[1];
         $long = $array[2];
 
@@ -228,11 +221,12 @@ die();
             'lat'       => $lat,
             'long'      => $long,
             'date'      => $array[3]/1000,
-            'activity_id'  => $this->_getActivityIdByName( $array[4] ),
+            'activity_id'  => $array[4],//$this->_getActivityIdByName( $array[4] ),
             'city_id'  => $this->_getCityIdByName( core_google_geo::findCityName($lat, $long) ),
         );
 
 
+        core_log::log($data,self::$grabtime.'.event.imap.log');
         return $data ;
     }
 
@@ -262,7 +256,7 @@ die();
        // $csv = str_replace("\r",'',$csv);
        // $csv = str_replace("\n",',',$csv);
 
-
+        $csv = preg_replace('/\{:START:\}(.*)?\{:END:\}/sumix','\1',$csv);
 
         return $csv;
     }
