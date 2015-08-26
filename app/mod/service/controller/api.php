@@ -12,7 +12,6 @@ class service_controller_api extends core_controller{
         $ftmp = fopen('php://output', 'w');
         $activities = $ac->toArray(  );
         foreach($activities as $id=>$activity){
-core_debug::dump($activities);
             fputs($ftmp,"{:$id:}{$activity['name']}\n");
         }
         fclose($ftmp);
