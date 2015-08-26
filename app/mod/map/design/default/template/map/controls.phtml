@@ -46,7 +46,7 @@ $luser = app::getSession()->getLoggedInUser();
             <div id="tab-activity">
                 <a href="javascript:void(0);" class="right check-all-filters"
                    selector="input.marker-field-filter[field=activity_id]">Выбрать все</a>
-		<div style="max-height:300px;overflow-y:auto;">
+		<div style="max-height:600px;overflow-y:auto;">
                 <table>
                     <?php foreach ($this->getVar('activities') as $activity): ?>
                         <tr>
@@ -70,7 +70,7 @@ $luser = app::getSession()->getLoggedInUser();
             <div id="tab-city">
                 <a href="javascript:void(0);" class="right check-all-filters"
                    selector="input.marker-field-filter[field=city_id]">Выбрать все</a>
-		<div style="max-height:300px;overflow-y:auto;">
+		<div style="max-height:600px;overflow-y:auto;">
                 <table>
 
                     <?php foreach ($this->getVar('cities') as $city): ?>
@@ -94,7 +94,7 @@ $luser = app::getSession()->getLoggedInUser();
             <div id="tab-traders">
                 <a href="javascript:void(0);" class="right check-all-filters"
                    selector="input.marker-field-filter[field=user_id]">Выбрать все</a>
-		<div style="max-height:300px;overflow-y:auto;">
+		<div style="max-height:600px;overflow-y:auto;">
                 <table>
 
                     <?php
@@ -124,16 +124,15 @@ $luser = app::getSession()->getLoggedInUser();
                                     />
                             </td>
                             <td>
-                                <label for="user_<?php echo $trader->getId() ?>">
-                                    <?php echo $trader->getData('fullname') ?>
-                                </label>
                                 <?php if($luser->getData('role_id')==manage_model_role::ROLE_ADMIN):
                                     $manager = new manage_model_user();
                                     $manager->load( $trader->getData('parent_id') );
-
                                     ?>
-                                    <div title="Менеджер: <?php echo $manager->getData('fullname'); ?>">(<?php echo $manager->getData('fullname'); ?>)</div>
                                 <?php endif ?>
+                                <label for="user_<?php echo $trader->getId() ?>" title="Менеджер: <?php echo $manager->getData('fullname'); ?>">
+                                    <?php echo $trader->getData('fullname') ?>
+                                </label>
+
                             </td>
 
                         </tr>
