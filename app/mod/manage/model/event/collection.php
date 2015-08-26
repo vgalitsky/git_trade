@@ -9,7 +9,7 @@ class manage_model_event_collection extends core_collection{
             $this->setSqlValue('user_parent_id',$luser->getId());
         }
         $sql= "SELECT event.*,
-                user.user_id, user.fullname as user_fullname, user.marker_color as marker_color,
+                user.user_id, user.fullname as user_fullname, user.marker_color as marker_color, user.parent_id as user_parent_id,
                 city.city_id as city_id, city.name as city_name,
                 activity.activity_id as activity_id, activity.name as activity_name
               FROM `{$this->getTable()}` as event

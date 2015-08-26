@@ -16,11 +16,30 @@ class app{
         self::$_pdo = core_pdo::getAdapter( $this->getConfig('pdo/adapter'), $this->getConfig('pdo/config') );
     }
 
-    /**
-     *
-     */
+
     public function run(){
-        $this->_dispatchController();
+        try {
+            $this->_dispatchController();
+        }catch(core_exception $e){
+            self::processCoreException( $e );
+        }catch(Exception $e){
+            self::processException($e);
+        }
+        return $this;
+    }
+
+    static function processCoreException( $e ){
+        $msg = core_log::logCoreException($e);
+        if(app::getConfig('app/echo_app_exception')){
+            echo nl2br($msg);
+        }
+    }
+
+    static function processException( $e ){
+        $msg = core_log::logException($e);
+        if(app::getConfig('app/echo_exception')){
+            echo nl2br($msg);
+        }
     }
 
     /**
@@ -58,9 +77,9 @@ class app{
      * @return core_controller
      */
     public function getController(){
-        $ctrl_class = self::getRequest()->getModule() . CS .core_controller::DIR .CS. self::getRequest()->getControllerName();
+        $ctrl_class = (self::getRequest()->getModule() ? self::getRequest()->getModule(): app::getConfig('mod/default')) . CS .core_controller::DIR .CS. self::getRequest()->getControllerName();
         if(!class_exists($ctrl_class)){
-            throw new Exception("Cannot find controller '$ctrl_class'");
+            throw new core_exception("Cannot find controller '$ctrl_class'");
         }
         $controller = new $ctrl_class();
         $controller->setRequest( self::getRequest() );
@@ -85,7 +104,7 @@ class app{
      */
     static function getModel( $model, $param=null ){
         if(!class_exists($model)){
-            throw new Exception("Cannot find model '{$model}'");
+            throw new core_exception("Cannot find model '{$model}'");
         }
         $model = new $model( $param );
         $model->setConnection( self::getConnection() );

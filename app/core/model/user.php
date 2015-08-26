@@ -11,7 +11,7 @@ class core_model_user extends core_model
     public function authenticate($username, $password)
     {
 
-        $sql = "SELECT * FROM {$this->getTable()} WHERE username = ? AND (password=MD5(?) OR password='')";
+        $sql = "SELECT * FROM {$this->getTable()} WHERE username = ? AND password=MD5(?) ";
         $user = $this->sqlFetch($sql, array($username, $password));
         if (!$user || !$user[$this->getIdField()]) {
                 return false;

@@ -6,6 +6,10 @@ class manage_block_user_addform extends manage_block_template{
     }
 
     protected function _initVars(){
+        $city_model = new manage_model_city();
+        $city_collection = $city_model->getCollection();
+        $this->setVar('cities',$city_collection);
+
         $manager_model = new manage_model_user();
         /** @var manage_model_user_collection $manager_collection */
         $manager_collection = $manager_model->getCollection();

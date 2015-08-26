@@ -10,9 +10,10 @@ class service_controller_api extends core_controller{
         $ac->load();
 
         $ftmp = fopen('php://output', 'w');
-        $activities = $ac->toArray( false );
-        foreach($activities as $activity){
-            fputcsv($ftmp,$activity);
+        $activities = $ac->toArray(  );
+        foreach($activities as $id=>$activity){
+core_debug::dump($activities);
+            fputs($ftmp,"{:$id:}{$activity['name']}\n");
         }
         fclose($ftmp);
     }

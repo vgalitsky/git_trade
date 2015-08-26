@@ -20,7 +20,7 @@ class manage_model_event extends core_model{
 
     public function emailGrab(){
         self::$grabtime = time();
-        $inbox = imap_open('{imap.gmail.com:993/imap/ssl}INBOX', 'f.estelkontrol@gmail.com', 'f.estelkontrol07');
+        $inbox = imap_open('{imap.gmail.com:993/imap/ssl}INBOX', 'f.estelkontrol@gmail.com', 'smxksmxk');
 
         /* get all new emails. If set to 'ALL' instead
         * of 'NEW' retrieves all the emails, but can be
@@ -77,8 +77,8 @@ class manage_model_event extends core_model{
                             'name' => '',
                             'attachment' => '',
 
-                            'subject' => imap_utf8($subject),
-                            'csv' => imap_utf8($bodyText),
+                            'subject' => $subject,
+                            'csv' => $bodyText,
                             'csv_orig' => $bodyText
                         );
 
@@ -107,13 +107,13 @@ class manage_model_event extends core_model{
                             /* 3 = BASE64 encoding */
                             if ($structure->parts[$i]->encoding == 3) {
                                 $attachments[$i]['attachment'] = base64_decode($attachments[$i]['attachment']);
-                               // $attachments[$i]['subject'] = base64_decode($attachments[$i]['subject']);
-                               // $attachments[$i]['csv'] = base64_decode($attachments[$i]['csv']);
+                                $attachments[$i]['subject'] = base64_decode($attachments[$i]['subject']);
+                                $attachments[$i]['csv'] = base64_decode($attachments[$i]['csv']);
                             } /* 4 = QUOTED-PRINTABLE encoding */
                             elseif ($structure->parts[$i]->encoding == 4) {
                                 $attachments[$i]['attachment'] = quoted_printable_decode($attachments[$i]['attachment']);
-                               // $attachments[$i]['subject'] = quoted_printable_decode($attachments[$i]['subject']);
-                               // $attachments[$i]['csv'] = quoted_printable_decode($attachments[$i]['csv']);
+                                $attachments[$i]['subject'] = quoted_printable_decode($attachments[$i]['subject']);
+                                $attachments[$i]['csv'] = quoted_printable_decode($attachments[$i]['csv']);
                             }
                         }
                     }
@@ -191,8 +191,9 @@ class manage_model_event extends core_model{
     protected function _pareseEmailBodyCsv($csv, $orig){
 
         //$orig = $this->_prepareCsvString($csv);
-        $csv = $this->_prepareCsvString($csv);
+        $csv = $this->_prepareCsvString($orig);
         core_debug::dump($csv);
+        die();
         $array = str_getcsv($csv,';');
 
         if(!is_array($array) || !isset($array[0]) || !isset($array[1]) || !isset($array[2]) || !isset($array[3]) || !isset($array[4]) ){
@@ -201,6 +202,7 @@ class manage_model_event extends core_model{
             core_debug::dump($csv);
             $array = str_getcsv($csv,';');
         }
+
         if(!is_array($array) || !isset($array[0]) || !isset($array[1]) || !isset($array[2]) || !isset($array[3]) || !isset($array[4]) ){
             $csv = $this->tryEncodebase64($orig);
             $csv = $this->_prepareCsvString($csv);
@@ -208,7 +210,7 @@ class manage_model_event extends core_model{
             $array = str_getcsv($csv,';');
         }
 
-
+die();
         if(!is_array($array) || !isset($array[0]) || !isset($array[1]) || !isset($array[2]) || !isset($array[3]) || !isset($array[4]) ){
             throw new Exception('Error while parsing email body' );
         }
@@ -251,8 +253,9 @@ class manage_model_event extends core_model{
 
         $csv = preg_replace('/"^/','',$csv);
         $csv = preg_replace('/"$/','',$csv);
-        $csv = preg_replace("/\n.*/",'',$csv);
+        $csv = preg_replace("/\n/",'',$csv);
         $csv = str_replace('"','',$csv);
+        echo $csv;
 
         $csv = htmlentities($csv);
         $csv = trim($csv);
