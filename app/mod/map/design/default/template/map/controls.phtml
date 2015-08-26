@@ -110,7 +110,7 @@ $luser = app::getSession()->getLoggedInUser();
                             endif;?>
                         <?php endif ?>
 
-                        <tr class="<?php echo $hc;?>">
+                        <tr class="<?php echo $hc;?>" parent_id="<?php echo $trader->getData('parent_id')?>">
                             <td>
 
                                 <input
@@ -127,6 +127,13 @@ $luser = app::getSession()->getLoggedInUser();
                                 <label for="user_<?php echo $trader->getId() ?>">
                                     <?php echo $trader->getData('fullname') ?>
                                 </label>
+                                <?php if($luser->getData('role_id')==manage_model_role::ROLE_ADMIN):
+                                    $manager = new manage_model_user();
+                                    $manager->load( $trader->getData('parent_id') );
+
+                                    ?>
+                                    <div title="Менеджер: <?php echo $manager->getData('fullname'); ?>">(<?php echo $manager->getData('fullname'); ?>)</div>
+                                <?php endif ?>
                             </td>
 
                         </tr>
