@@ -392,8 +392,17 @@ $luser = app::getSession()->getLoggedInUser();
     Версия обновлена.
     <br/>
     <br/>
-    <br/>
     Возможна нестабильная работа приложения.
+    <br/>
+    <br/>
+
+    1. Привяжите Менеджера (супервайзера) к городу.
+    <br/>
+    2. Привяжите агента к менеджеру.
+    <br/>
+    3. см. Фильтры "Менеджеры без привязки"
+    <br/>
+    4. см. Фильтры "Агенты без привязки"
     <br/>
 
     <!--a target="_blank" href="<?php echo $this->getUrl('manage/feedback/report') ?>">С ошибками/предложениями сюда</a-->
@@ -436,7 +445,9 @@ $luser = app::getSession()->getLoggedInUser();
 <script>
     $(function () {
         $('#version').dialog({
+            width:400,
             buttons:[{
+
                 text: 'Закрыть',
                 click: function () {
                     $(this).dialog('close');
