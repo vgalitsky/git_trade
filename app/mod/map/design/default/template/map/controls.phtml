@@ -296,6 +296,47 @@ $luser = app::getSession()->getLoggedInUser();
                                     </div>
                                 </td>
                             </tr>
+                        <?php
+
+                        $user = new manage_model_user();
+                        $traders = $user->getWoParentCollection();
+                        ?>
+                        <tr>
+                            <td valign="top" width="2%">
+                                <input type="checkbox" class="depend-children" depend="#tree_city_<?php echo 'wo' ?>_content input[type=checkbox]" checked id="tree_city_<?php echo 'wo' ?>"/>
+                            </td>
+                            <td valign="top">
+                                <a href="javascript:void(0);" class="tree_expand_ctrl" for="tree_city_<?php echo 'wo' ?>_content" id="tree_city_<?php echo 'wo' ?>_expand_ctrl">
+                                    <i>+</i>Агенты без привязки
+                                </a>
+
+                                    <div id="tree_city_<?php echo 'wo' ?>_content">
+                                        <table width="100%" cellspacing="0">
+                                            <?php foreach($traders as $trader):?>
+                                                <tr>
+                                                    <td width="2%" style="border-left:1px solid silver;">
+                                                        <input
+                                                            checked
+                                                            type="checkbox" trader_id="<?php echo $trader->getId() ?>"
+                                                            field="user_id" field_value="<?php echo $trader->getId() ?>"
+                                                            class="marker-field-filter "
+                                                            name="filter[trader][<?php echo $trader->getId() ?>]"
+                                                            id="user_<?php echo $trader->getId() ?>"
+                                                            />
+                                                    </td>
+                                                    <td>
+                                                        <label for="user_<?php echo $trader->getId() ?>" style="color:#ee3333">
+                                                            <?php echo $trader->getData('fullname') ?>
+                                                            <span title="Количество событий">(<?php echo $trader->getEventsCount($filter['date']['from'],$filter['date']['to']) ?>)</span>
+                                                        </label>
+                                                    </td>
+                                                </tr>
+                                            <?php endforeach;?>
+                                        </table>
+                                    </div>
+                            </td>
+                        </tr>
+
 
                     </table>
                 </div>
