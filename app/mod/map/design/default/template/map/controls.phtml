@@ -32,7 +32,7 @@ $luser = app::getSession()->getLoggedInUser();
             <li><a href="#tab-managers">Фильтры</a></li>
             <li><a href="#tab-activity">Активности</a></li>
             <li><a href="#tab-city">ГЕО</a></li>
-            <!--li><a href="#tab-traders">Агенты</a></li-->
+            <li><a href="#tab-traders">Агенты (времмено)</a></li>
 
             <li>
                 <a href="#tab-settings" title="Настройки">
@@ -109,7 +109,7 @@ $luser = app::getSession()->getLoggedInUser();
                     </table>
                 </div>
             </div>
-            <!--div id="tab-traders">
+            <div id="tab-traders">
                 <a href="javascript:void(0);" class="check-all-filters"
                    selector="input.marker-field-filter[field=user_id]">Отметить все</a>
                 &nbsp;|&nbsp;
@@ -161,7 +161,7 @@ $luser = app::getSession()->getLoggedInUser();
                         <?php endforeach ?>
                     </table>
                 </div>
-            </div-->
+            </div>
             <div id="tab-managers">
                 <!--a href="javascript:void(0);" class="check-all-filters"
                    selector="input.marker-field-filter[field=user_id]">Отметить все</a>
@@ -258,7 +258,7 @@ $luser = app::getSession()->getLoggedInUser();
                                                 <tr>
                                                     <td valign="top" width="2%" style="border-left:1px solid silver;">
                                                         <input type="checkbox" class="depend-children" depend="#tree_city_<?php echo $city->getId() ?>_manager_<?php echo $manager->getId() ?>_content input[type=checkbox]" checked id="tree_city_<?php echo $city->getId() ?>_manager_<?php echo $manager->getId() ?>"/>
-                                                        
+
                                                     </td>
                                                     <td valign="top">
                                                         <a href="javascript:void(0);" class="tree_expand_ctrl" for="tree_city_<?php echo $city->getId() ?>_manager_<?php echo $manager->getId() ?>_content" >-</a>
