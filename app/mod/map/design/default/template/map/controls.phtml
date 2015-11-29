@@ -257,7 +257,8 @@ $luser = app::getSession()->getLoggedInUser();
                                             <?php foreach( $managers as $manager ): ?>
                                                 <tr>
                                                     <td valign="top" width="2%" style="border-left:1px solid silver;">
-                                                        <input type="checkbox" checked id="tree_city_<?php echo $city->getId() ?>_manager_<?php echo $manager->getId() ?>"/>
+                                                        <input type="checkbox" class="depend-children" depend="#tree_city_<?php echo $city->getId() ?>_manager_<?php echo $manager->getId() ?>_content input[type=checkbox]" checked id="tree_city_<?php echo $city->getId() ?>_manager_<?php echo $manager->getId() ?>"/>
+                                                        
                                                     </td>
                                                     <td valign="top">
                                                         <a href="javascript:void(0);" class="tree_expand_ctrl" for="tree_city_<?php echo $city->getId() ?>_manager_<?php echo $manager->getId() ?>_content" >-</a>
