@@ -193,10 +193,10 @@ $luser = app::getSession()->getLoggedInUser();
                                         <table width="100%" cellspacing="0">
                                             <?php foreach( $managers as $manager ): ?>
                                                 <tr>
-                                                    <td valign="top" width="2%" style="border-left:1px solid silver;">
+                                                    <td valign="top" width="2%" style="border-left:1px dotted silver;">
                                                         <input type="checkbox" class="depend-children" depend="#tree_city_<?php echo $city->getId() ?>_manager_<?php echo $manager->getId() ?>_content input[type=checkbox]" checked id="tree_city_<?php echo $city->getId() ?>_manager_<?php echo $manager->getId() ?>"/>
                                                     </td>
-                                                    <td valign="top">
+                                                    <td valign="top" >
                                                         <a href="javascript:void(0);" class="tree_expand_ctrl" for="tree_city_<?php echo $city->getId() ?>_manager_<?php echo $manager->getId() ?>_content" >-</a>
                                                         <label for="tree_city_<?php echo $city->getId() ?>_manager_<?php echo $manager->getId() ?>" style="font-weight:bold;">
                                                             <?php echo $manager->getData('fullname') ?>
@@ -205,7 +205,7 @@ $luser = app::getSession()->getLoggedInUser();
                                                             <table width="100%" cellspacing="0">
                                                             <?php foreach($manager->getManagerChildrenCollection() as $trader):?>
                                                                 <tr>
-                                                                    <td width="2%" style="border-left:1px solid silver;">
+                                                                    <td width="2%" style="border-left:1px dotted silver; ">
                                                                         <input
                                                                             checked
                                                                             type="checkbox" trader_id="<?php echo $trader->getId() ?>"
@@ -216,9 +216,10 @@ $luser = app::getSession()->getLoggedInUser();
                                                                             />
                                                                     </td>
                                                                     <td>
-                                                                        <label for="user_<?php echo $trader->getId() ?>" style="">
+                                                                        <label for="user_<?php echo $trader->getId() ?>" >
+                                                                            <img height="12px" src="http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|<?php echo $trader->getData('marker_color') ? str_replace('#','',$trader->getData('marker_color')) : '#000' ?>" />
                                                                             <?php echo $trader->getData('fullname') ?>
-                                                                            <span title="Количество событий">(<?php echo $trader->getEventsCount($filter['date']['from'],$filter['date']['to']) ?>)</span>
+                                                                            (<span ___style="color: <?php echo $trader->getData('marker_color') ? $trader->getData('marker_color') : '#000' ?>" title="Количество событий"><?php echo $trader->getEventsCount($filter['date']['from'],$filter['date']['to']) ?></span>)
                                                                         </label>
                                                                     </td>
                                                                 </tr>
