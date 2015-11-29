@@ -29,4 +29,21 @@ class manage_model_user_collection extends core_collection{
         return $this;
     }
 
+    public function addCityFilter( $city_id ){
+        $sql = $this->getSql();
+        if($city_id === null){
+            $sql .= " AND ({$this->getTable()}.city_id IS NULL)";
+        }else {
+            $sql .= " AND ({$this->getTable()}.city_id=:city_id)";
+            $this->setSqlValue('city_id',$city_id);
+        }
+        $this->setSql($sql);
+
+        return $this;
+    }
+
+    protected function _beforeLoad(){
+
+    }
+
 }

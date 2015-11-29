@@ -46,7 +46,7 @@ $cities = $this->getVar('cities');
                 </select>
             </td>
         </tr>
-        <tr id="user-form-city-id" class="<?php if($user->getId() && $user->getData('role_id')!=manage_model_role::ROLE_AGENT) echo 'hidden' ?>">
+        <tr id="user-form-city-id" class="<?php if($user->getId() && $user->getData('role_id')!=manage_model_role::ROLE_MANAGER) echo 'hidden' ?>">
             <td>Город</td>
             <td>
                 <select name="user[city_id]" value="<?php $user->getData('city_id') ?>">
@@ -76,10 +76,10 @@ $cities = $this->getVar('cities');
         $('select[name=user\\[role_id\\]]').on('change',function(){
             if($(this).val()!=='<?php echo manage_model_role::ROLE_AGENT ?>'){
                 $('#user-form-parent-id').hide();
-                $('#user-form-city-id').hide();
+                $('#user-form-city-id').show();
                 $('#user-form-marker-color').hide();
             }else{
-                $('#user-form-city-id').show();
+                $('#user-form-city-id').hide();
                 $('#user-form-parent-id').show();
                 $('#user-form-marker-color').show();
             }

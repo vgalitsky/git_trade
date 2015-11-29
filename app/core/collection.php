@@ -4,6 +4,7 @@ class core_collection implements IteratorAggregate, Countable{
     protected $_items;
     protected $_loaded;
     protected $_model_class;
+    protected $_parts;
 
 
     /** @var  PDO */

@@ -3,12 +3,24 @@ class map_controller_index extends map_controller_requirelogin{
 
 
     public function activityAction(){
+        $filter = $this->getRequest()->getParam('filter');
+//        core_debug::dump($filter);
+//        die();
+
         $this->initLayout();
         /** @var core_block_page $page */
         $page = $this->getLayout()->getPageBlock();
         $page->addChild('head',new map_block_head());
         $map = new map_block_map();
-        $map->addChild('controls', new map_block_map_controls());
+        $controls_block = new map_block_map_controls();
+        if($filter) {
+            if($filter['date']){
+                $filter['date']['from'] = strtotime($filter['date']['from']);
+                $filter['date']['to'] = strtotime($filter['date']['to']);
+            }
+            $controls_block->setVar('filter', $filter);
+        }
+        $map->addChild('controls', $controls_block );
         $map->addChild('toolbar', new map_block_map_toolbar());
         $this->getLayout()->getPageBlock()->addChild('root', $map);
         //core_debug::dump($this->getLayout());

@@ -3,6 +3,12 @@
     #manage-tabs .tab-content{
 
     }
+ tbody tr:nth-child(even){
+    background-color:#efefef;
+}
+    tbody tr:hover{
+    background-color:#ccc;
+}
 </style>
 <div class="main">
     <div id="manage-tabs" class="tabs">
@@ -18,6 +24,7 @@
 <div class="clear"></div>
 <script>
     (function($){
+        $( ".tabs" ).tabs();
         $.ajax({
            url: '<?php echo $this->getUrl('manage/city/list')?>',
            complete: function(response){

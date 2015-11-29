@@ -32,9 +32,10 @@ thead{
     text-align:left;
     background-color: #efefef;
 }
-tbody tr:nth-child(even){
+/*tbody tr:nth-child(even){
     background-color:#efefef;
-}
+}*/
+
 td{
     padding:2px;
 }

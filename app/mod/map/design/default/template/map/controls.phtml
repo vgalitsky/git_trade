@@ -6,17 +6,22 @@ $luser = app::getSession()->getLoggedInUser();
 <style>
     #controls {
         position: absolute;
-        top: 10px;
+        top: 35px;
         left: 20px;
         z-index: 99;
         /*background-color: #fff;*/
         padding: 10px;
         height: 300px;
         width: 350px;
-        opacity: 0.8;
+        /*opacity: 0.8;*/
         /*border:1px solid #ccc;*/
         display: none;
     }
+    a.tree_expand_ctrl{
+     text-decoration: none;
+        font-weight:bold;
+    }
+
 </style>
 <div id="controls">
 
@@ -24,14 +29,18 @@ $luser = app::getSession()->getLoggedInUser();
 
         <ul style="font-size:10px;">
             <li><a href="#tab-date">Период</a></li>
+            <li><a href="#tab-managers">Фильтры</a></li>
             <li><a href="#tab-activity">Активности</a></li>
-            <li><a href="#tab-city">Города</a></li>
-            <li><a href="#tab-traders">Агенты</a></li>
-            <li><a href="#tab-settings" title="Настройки"><img height="10px"
-                                                               src="<?php echo $this->getSkinUrl('img/user_info.png') ?>"/></a>
+            <li><a href="#tab-city">ГЕО</a></li>
+            <!--li><a href="#tab-traders">Агенты</a></li-->
+
+            <li>
+                <a href="#tab-settings" title="Настройки">
+                    <img height="10px" src="<?php echo $this->getSkinUrl('img/user_info.png') ?>"/>
+                </a>
             </li>
         </ul>
-        <form id="controls-form" onsubmit="return false;">
+        <form id="controls-form" method="post">
             <div id="tab-date">
                 <p>От: <input type="text" name="filter[date][from]"
                               value="<?php echo date('d.m.Y', $filter['date']['from']) ?>" class="datepicker"></p>
@@ -40,105 +49,257 @@ $luser = app::getSession()->getLoggedInUser();
                               value="<?php echo date('d.m.Y', $filter['date']['to']) ?>" class="datepicker"></p>
 
                 <div class="ui-buttonset">
-                    <button class="button" onclick="gisTrade.init();"><span>Применить</span></button>
+                    <button class="button" onclick="$('#controls-form').submit()"><span>Применить</span></button>
                 </div>
             </div>
             <div id="tab-activity">
-                <a href="javascript:void(0);" class="right check-all-filters"
-                   selector="input.marker-field-filter[field=activity_id]">Выбрать все</a>
-		<div style="max-height:600px;overflow-y:auto;">
-                <table>
-                    <?php foreach ($this->getVar('activities') as $activity): ?>
-                        <tr>
-                            <td>
-                                <input type="checkbox" checked field="activity_id"
-                                       field_value="<?php echo $activity->getId() ?>" class="marker-field-filter"
-                                       name="filter[activity][<?php echo $activity->getId() ?>]"
-                                       id="activity_<?php echo $activity->getId() ?>"
-                                    />
-                            </td>
-                            <td>
-                                <label
-                                    for="activity_<?php echo $activity->getId() ?>"><?php echo $activity->getData('name') ?></label>
-                            </td>
+                <a href="javascript:void(0);" class="check-all-filters"
+                   selector="input.marker-field-filter[field=activity_id]">Отметить все</a>
+                &nbsp;|&nbsp;
+                <a href="javascript:void(0);" class="uncheck-all-filters"
+                   selector="input.marker-field-filter[field=activity_id]">Снять отметку</a>
 
-                        </tr>
-                    <?php endforeach ?>
-                </table>
-		</div>
+                <div style="max-height:600px;overflow-y:auto;">
+                    <table>
+                        <?php foreach ($this->getVar('activities') as $activity): ?>
+                            <tr>
+                                <td>
+                                    <input type="checkbox" checked field="activity_id"
+                                           field_value="<?php echo $activity->getId() ?>" class="marker-field-filter"
+                                           name="filter[activity][<?php echo $activity->getId() ?>]"
+                                           id="activity_<?php echo $activity->getId() ?>"
+                                        />
+                                </td>
+                                <td>
+                                    <label
+                                        for="activity_<?php echo $activity->getId() ?>"><?php echo $activity->getData('name') ?></label>
+                                </td>
+
+                            </tr>
+                        <?php endforeach ?>
+                    </table>
+                </div>
             </div>
             <div id="tab-city">
-                <a href="javascript:void(0);" class="right check-all-filters"
-                   selector="input.marker-field-filter[field=city_id]">Выбрать все</a>
-		<div style="max-height:600px;overflow-y:auto;">
-                <table>
+                <a href="javascript:void(0);" class="check-all-filters"
+                   selector="input.marker-field-filter[field=city_id]">Отметить все</a>
+                &nbsp;|&nbsp;
+                <a href="javascript:void(0);" class="uncheck-all-filters"
+                   selector="input.marker-field-filter[field=city_id]">Снять отметку</a>
 
-                    <?php foreach ($this->getVar('cities') as $city): ?>
-                        <tr>
-                            <td>
-                                <input type="checkbox" checked field="city_id"
-                                       field_value="<?php echo $city->getId() ?>" class="marker-field-filter"
-                                       name="filter[city][<?php echo $city->getId() ?>]"
-                                       id="city_<?php echo $city->getId() ?>"/>
-                            </td>
-                            <td>
-                                <label
-                                    for="city_<?php echo $city->getId() ?>"><?php echo $city->getData('name') ?></label>
-                            </td>
 
-                        </tr>
-                    <?php endforeach ?>
-                </table>
-		</div>
+                <div style="max-height:600px;overflow-y:auto;">
+                    <table>
+
+                        <?php foreach ($this->getVar('cities') as $city): ?>
+                            <tr>
+                                <td>
+                                    <input type="checkbox" checked field="city_id"
+                                           field_value="<?php echo $city->getId() ?>" class="marker-field-filter"
+                                           name="filter[city][<?php echo $city->getId() ?>]"
+                                           id="city_<?php echo $city->getId() ?>"/>
+                                </td>
+                                <td>
+                                    <label
+                                        for="city_<?php echo $city->getId() ?>"><?php echo $city->getData('name') ?></label>
+                                </td>
+
+                            </tr>
+                        <?php endforeach ?>
+                    </table>
+                </div>
             </div>
-            <div id="tab-traders">
-                <a href="javascript:void(0);" class="right check-all-filters"
-                   selector="input.marker-field-filter[field=user_id]">Выбрать все</a>
-		<div style="max-height:600px;overflow-y:auto;">
-                <table>
+            <!--div id="tab-traders">
+                <a href="javascript:void(0);" class="check-all-filters"
+                   selector="input.marker-field-filter[field=user_id]">Отметить все</a>
+                &nbsp;|&nbsp;
+                <a href="javascript:void(0);" class="uncheck-all-filters"
+                   selector="input.marker-field-filter[field=user_id]">Снять отметку</a>
 
-                    <?php
+                <div style="max-height:600px;overflow-y:auto;">
+                    <table>
 
-                    foreach ($this->getVar('traders') as $trader): ?>
                         <?php
-                        $hc='';
-                        $checked = 'checked';
-                        if($luser->getData('role_id')!=manage_model_role::ROLE_ADMIN):?>
-                            <?php if($trader->getData('parent_id') != $luser->getId()):
-                                $hc = 'hidden';
-                                $checked = '';
-                            endif;?>
-                        <?php endif ?>
 
-                        <tr class="<?php echo $hc;?>" parent_id="<?php echo $trader->getData('parent_id')?>">
-                            <td>
+                        foreach ($this->getVar('traders') as $trader): ?>
+                            <?php
+                            $hc = '';
+                            $checked = 'checked';
+                            if ($luser->getData('role_id') != manage_model_role::ROLE_ADMIN):?>
+                                <?php if ($trader->getData('parent_id') != $luser->getId()):
+                                    $hc = 'hidden';
+                                    $checked = '';
+                                endif; ?>
+                            <?php endif ?>
 
-                                <input
+                            <tr class="<?php echo $hc; ?>" parent_id="<?php echo $trader->getData('parent_id') ?>">
+                                <td>
 
-                                    <?php echo $checked ?>
-                                    type="checkbox" trader_id="<?php echo $trader->getId() ?>"
-                                       field="user_id" field_value="<?php echo $trader->getId() ?>"
-                                       class="marker-field-filter "
-                                       name="filter[trader][<?php echo $trader->getId() ?>]"
-                                       id="user_<?php echo $trader->getId() ?>"
-                                    />
-                            </td>
-                            <td>
-                                <?php
+                                    <input
+
+                                        <?php echo $checked ?>
+                                        type="checkbox" trader_id="<?php echo $trader->getId() ?>"
+                                        field="user_id" field_value="<?php echo $trader->getId() ?>"
+                                        class="marker-field-filter "
+                                        name="filter[trader][<?php echo $trader->getId() ?>]"
+                                        id="user_<?php echo $trader->getId() ?>"
+                                        />
+                                </td>
+                                <td>
+                                    <?php
                                     $manager = new manage_model_user();
-                                    $manager->load( $trader->getData('parent_id') );
+                                    $manager->load($trader->getData('parent_id'));
                                     ?>
-                                <label for="user_<?php echo $trader->getId() ?>" title="Менеджер: <?php echo $manager->getData('fullname'); ?>">
-                                    <?php echo $trader->getData('fullname') ?>
-                                </label>
+                                    <label for="user_<?php echo $trader->getId() ?>"
+                                           title="Менеджер: <?php echo $manager->getData('fullname'); ?>">
+                                        <?php echo $trader->getData('fullname') ?>
+                                    </label>
 
-                            </td>
+                                </td>
 
-                        </tr>
-                    <?php endforeach ?>
-                </table>
-		</div>
+                            </tr>
+                        <?php endforeach ?>
+                    </table>
+                </div>
+            </div-->
+            <div id="tab-managers">
+                <!--a href="javascript:void(0);" class="check-all-filters"
+                   selector="input.marker-field-filter[field=user_id]">Отметить все</a>
+                &nbsp;|&nbsp;
+                <a href="javascript:void(0);" class="uncheck-all-filters"
+                   selector="input.marker-field-filter[field=user_id]">Снять отметку</a-->
+
+                <div style="max-height:600px;overflow-y:auto;">
+                    <table width="98%">
+
+                        <?php
+
+                        foreach ($this->getVar('cities') as $city):
+                            $managers = $city->getManagerCollection();
+                            $managers->load();
+                            if(!$managers->count()){
+                                continue;
+                            }
+                            ?>
+                            <tr>
+                                <td valign="top" width="2%">
+                                    <input class="depend-children" depend="#tree_city_<?php echo $city->getId() ?>_content input[type=checkbox]" type="checkbox" checked  id="tree_city_<?php echo $city->getId() ?>"/>
+                                </td>
+                                <td valign="top">
+                                    <a href="javascript:void(0);" class="tree_expand_ctrl" for="tree_city_<?php echo $city->getId() ?>_content" id="tree_city_<?php echo $city->getId() ?>_expand_ctrl">
+                                        <i>+</i><?php echo $city->getData('name') ?>
+                                    </a>
+                                    <div id="tree_city_<?php echo $city->getId() ?>_content" style="display: none;">
+                                        <table width="100%" cellspacing="0">
+                                            <?php foreach( $managers as $manager ): ?>
+                                                <tr>
+                                                    <td valign="top" width="2%" style="border-left:1px solid silver;">
+                                                        <input type="checkbox" class="depend-children" depend="#tree_city_<?php echo $city->getId() ?>_manager_<?php echo $manager->getId() ?>_content input[type=checkbox]" checked id="tree_city_<?php echo $city->getId() ?>_manager_<?php echo $manager->getId() ?>"/>
+                                                    </td>
+                                                    <td valign="top">
+                                                        <a href="javascript:void(0);" class="tree_expand_ctrl" for="tree_city_<?php echo $city->getId() ?>_manager_<?php echo $manager->getId() ?>_content" >-</a>
+                                                        <label for="tree_city_<?php echo $city->getId() ?>_manager_<?php echo $manager->getId() ?>" style="font-weight:bold;">
+                                                            <?php echo $manager->getData('fullname') ?>
+                                                        </label>
+                                                        <div id="tree_city_<?php echo $city->getId() ?>_manager_<?php echo $manager->getId() ?>_content">
+                                                            <table width="100%" cellspacing="0">
+                                                            <?php foreach($manager->getManagerChildrenCollection() as $trader):?>
+                                                                <tr>
+                                                                    <td width="2%" style="border-left:1px solid silver;">
+                                                                        <input
+                                                                            checked
+                                                                            type="checkbox" trader_id="<?php echo $trader->getId() ?>"
+                                                                            field="user_id" field_value="<?php echo $trader->getId() ?>"
+                                                                            class="marker-field-filter "
+                                                                            name="filter[trader][<?php echo $trader->getId() ?>]"
+                                                                            id="user_<?php echo $trader->getId() ?>"
+                                                                            />
+                                                                    </td>
+                                                                    <td>
+                                                                        <label for="user_<?php echo $trader->getId() ?>" style="">
+                                                                            <?php echo $trader->getData('fullname') ?>
+                                                                            <span title="Количество событий">(<?php echo $trader->getEventsCount($filter['date']['from'],$filter['date']['to']) ?>)</span>
+                                                                        </label>
+                                                                    </td>
+                                                                </tr>
+                                                            <?php endforeach;?>
+                                                            </table>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            <?php endforeach; ?>
+                                        </table>
+                                    </div>
+                                </td>
+                            </tr>
+
+
+                        <?php endforeach ?>
+
+                        <?php
+
+                            $city = new manage_model_city();
+                            $city->setId(NULL);
+                            $managers = $city->getManagerCollection();
+                            $managers->load();
+
+                            ?>
+                            <tr>
+                                <td valign="top" width="2%">
+                                    <input type="checkbox" class="depend-children" depend="#tree_city_<?php echo $city->getId() ?>_content input[type=checkbox]" checked id="tree_city_<?php echo $city->getId() ?>"/>
+                                </td>
+                                <td valign="top">
+                                    <a href="javascript:void(0);" class="tree_expand_ctrl" for="tree_city_<?php echo $city->getId() ?>_content" id="tree_city_<?php echo $city->getId() ?>_expand_ctrl">
+                                        <i>+</i>Менеджеры без привязки
+                                    </a>
+                                    <div id="tree_city_<?php echo $city->getId() ?>_content" style="display: none;">
+                                        <table width="100%" cellspacing="0">
+                                            <?php foreach( $managers as $manager ): ?>
+                                                <tr>
+                                                    <td valign="top" width="2%" style="border-left:1px solid silver;">
+                                                        <input type="checkbox" checked id="tree_city_<?php echo $city->getId() ?>_manager_<?php echo $manager->getId() ?>"/>
+                                                    </td>
+                                                    <td valign="top">
+                                                        <a href="javascript:void(0);" class="tree_expand_ctrl" for="tree_city_<?php echo $city->getId() ?>_manager_<?php echo $manager->getId() ?>_content" >-</a>
+                                                        <label for="tree_city_<?php echo $city->getId() ?>_manager_<?php echo $manager->getId() ?>" style="font-weight:bold;">
+                                                            <?php echo $manager->getData('fullname') ?>
+                                                        </label>
+                                                        <div id="tree_city_<?php echo $city->getId() ?>_manager_<?php echo $manager->getId() ?>_content">
+                                                            <table width="100%" cellspacing="0">
+                                                                <?php foreach($manager->getManagerChildrenCollection() as $trader):?>
+                                                                    <tr>
+                                                                        <td width="2%" style="border-left:1px solid silver;">
+                                                                            <input
+                                                                                checked
+                                                                                type="checkbox" trader_id="<?php echo $trader->getId() ?>"
+                                                                                field="user_id" field_value="<?php echo $trader->getId() ?>"
+                                                                                class="marker-field-filter "
+                                                                                name="filter[trader][<?php echo $trader->getId() ?>]"
+                                                                                id="user_<?php echo $trader->getId() ?>"
+                                                                                />
+                                                                        </td>
+                                                                        <td>
+                                                                            <label for="user_<?php echo $trader->getId() ?>" style="color:#ee3333">
+                                                                                <?php echo $trader->getData('fullname') ?>
+                                                                                <span title="Количество событий">(<?php echo $trader->getEventsCount($filter['date']['from'],$filter['date']['to']) ?>)</span>
+                                                                            </label>
+                                                                        </td>
+                                                                    </tr>
+                                                                <?php endforeach;?>
+                                                            </table>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            <?php endforeach; ?>
+                                        </table>
+                                    </div>
+                                </td>
+                            </tr>
+
+                    </table>
+                </div>
             </div>
+
         </form>
         <div id="tab-settings">
             <form id="user_info_form" onsubmit="return false">
@@ -147,7 +308,8 @@ $luser = app::getSession()->getLoggedInUser();
                 <table>
                     <tr>
                         <td>Имя</td>
-                        <td><input type="text" name="user[fullname]" value="<?php echo $luser->getData('fullname') ?>"></td>
+                        <td><input type="text" name="user[fullname]" value="<?php echo $luser->getData('fullname') ?>">
+                        </td>
                     </tr>
                     <tr>
                         <td>Телефон</td>
@@ -155,12 +317,14 @@ $luser = app::getSession()->getLoggedInUser();
                     </tr>
                     <tr>
                         <td>Email</td>
-                        <td><input type="text" name="user[username]" value="<?php echo $luser->getData('username') ?>"></td>
+                        <td><input type="text" name="user[username]" value="<?php echo $luser->getData('username') ?>">
+                        </td>
                     </tr>
                     <tr>
                         <td>Пароль</td>
                         <td>
-                            <a href="javascript:void(0);" onclick="$('#user_change_password').fadeToggle()">Изменить пароль</a>
+                            <a href="javascript:void(0);" onclick="$('#user_change_password').fadeToggle()">Изменить
+                                пароль</a>
                             <table id="user_change_password" style="display:none">
                                 <tr>
                                     <td>Новый пароль</td>
@@ -202,10 +366,15 @@ $luser = app::getSession()->getLoggedInUser();
     }
 </style>
 <div id="manage-toolbar">
-    <?php if($luser->getData('role_id')== manage_model_role::ROLE_ADMIN) : ?>
-    <a id="manage" href="javascript:void(0);">Администрирование</a>
+    <?php if ($luser->getData('role_id') == manage_model_role::ROLE_ADMIN) : ?>
+        <a id="manage" href="javascript:void(0);">Администрирование</a>
     <?php endif; ?>
-    <a  href="<?php echo $this->getUrl('map/index/logout')?>">Выход</a>
+    &nbsp;|&nbsp;
+    <a href="<?php echo $this->getUrl('map/index/logout') ?>">Выход</a>
+    <?php if ($luser->getData('role_id') == manage_model_role::ROLE_ADMIN) : ?>
+        <br/>
+        <a id="manage" target="_blank" href="<?php echo $this->getUrl('manage/index/index') ?>">> в новом окне</a>
+    <?php endif; ?>
 </div>
 <div id="manage-dialog">
     <div id="manage-dialog-content">
@@ -214,7 +383,7 @@ $luser = app::getSession()->getLoggedInUser();
 </div>
 <script>
     $(function () {
-        $('#controls').show().draggable();
+        $('#controls').show();//.draggable();
 
         progressBar = '<img src="<?php echo self::getSkinUrl("images/progress-bar.gif", 'manage') ?>"/>';
         $('#manage').click(function () {
@@ -222,13 +391,13 @@ $luser = app::getSession()->getLoggedInUser();
             $('#manage-dialog').dialog({
                 title: 'Управление',
                 modal: true,
-                width: 800,
+                width: 950,
                 height: 600,
                 buttons: [
                     {
                         text: "Закрыть",
                         click: function () {
-                            location.href=location.href;
+                            location.href = location.href;
                             $(this).dialog("close");
                         }
                     }
@@ -245,13 +414,13 @@ $luser = app::getSession()->getLoggedInUser();
             })
         });
 
-        $('#user_info_form').on('submit',function(){
+        $('#user_info_form').on('submit', function () {
             $.ajax({
                 url: '<?php echo $this->getUrl('manage/user/save') ?>',
                 type: 'POST',
                 data: $('#user_info_form').serialize(),
-                complete: function(response){
-                    if(response.responseText){
+                complete: function (response) {
+                    if (response.responseText) {
                         $('#manage-dialog-content').html(response.responseText);
                         $('#manage-dialog').dialog({
                             title: 'Управление',
@@ -269,7 +438,7 @@ $luser = app::getSession()->getLoggedInUser();
                         });
 
                     }
-                    else{
+                    else {
                         alert('OK');
                     }
                 }
@@ -283,6 +452,19 @@ $luser = app::getSession()->getLoggedInUser();
         $('.check-all-filters').on('click', function () {
             $($(this).attr('selector')).prop('checked', true);
             gisTrade.filterMarkers();
+        });
+        $('.uncheck-all-filters').on('click', function () {
+            $($(this).attr('selector')).prop('checked', false);
+            gisTrade.filterMarkers();
+        });
+
+        $('.tree_expand_ctrl').on('click', function(){
+            $('#'+$(this).attr('for')).toggle();
+            $(this).find('i').html( $(this).find('i').html()=='+' ? '-' : '+' );
+        });
+
+        $('.depend-children').click(function(){
+            $($(this).attr('depend')).click();
         });
 
     });
