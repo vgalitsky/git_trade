@@ -1,6 +1,12 @@
 <?php echo  $this->renderChildHtml('toolbar')?>
 <?php echo  $this->renderChildHtml('controls')?>
 <div id="map-canvas"></div>
+<div id="working" style="padding:50px; background-color: #fff;z-index:99;">
+    Ждите
+</div>
+<div id="version">
+    Новая ерсия, возможна нестабильная работа
+</div>
 <script>
 
     function initialize() {
@@ -85,7 +91,6 @@
                 //infowindow.setPosition(mCluster.getCenter());
                 infowindow.open(gisTrade.map, gisTrade.activityMarkers[0]);
             });*/
-
 
             //gisTrade.showActivityMarkers(true);
             //gisTrade.filterMarkers();
@@ -205,6 +210,7 @@
             gisTrade.map.fitBounds(bounds);
         },
         filterMarkers: function () {
+            gisTrade.___working();
             for (var i in gisTrade.activityMarkers) {
                 var marker = gisTrade.activityMarkers[i];
                 var data = marker.___data.origData;
@@ -231,6 +237,7 @@
             }
             gisTrade.updateMarkerCluster();
             setTimeout(function(){gisTrade.zoomMapToVisible()},1000);
+            gisTrade.___workend();
         },
         deleteEvent: function( event_id){
             $.ajax({
@@ -239,11 +246,21 @@
             });
             gisTrade.deleteActivityMarker(event_id);
 
+        },
+        ___working: function(){
+            $('#working').dialog({
+                modal: true,
+                width: 400
+            });
+        },
+        ___workend: function(){
+            $('#working').dialog('close');
         }
     };
 
     $(function() {
         $( ".tabs" ).tabs();
+
 
 
 

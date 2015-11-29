@@ -388,6 +388,16 @@ $luser = app::getSession()->getLoggedInUser();
 
 
 </div>
+<div id="version">
+    Версия обновлена.
+    <br/>
+    <br/>
+    <br/>
+    Возможна нестабильная работа приложения.
+    <br/>
+
+    <!--a target="_blank" href="<?php echo $this->getUrl('manage/feedback/report') ?>">С ошибками/предложениями сюда</a-->
+</div>
 
 <style>
     #manage-toolbar {
@@ -425,6 +435,15 @@ $luser = app::getSession()->getLoggedInUser();
 </div>
 <script>
     $(function () {
+        $('#version').dialog({
+            buttons:[{
+                text: 'Закрыть',
+                click: function () {
+                    $(this).dialog('close');
+                }
+            }
+            ]
+        });
         $('#controls').show();//.draggable();
 
         progressBar = '<img src="<?php echo self::getSkinUrl("images/progress-bar.gif", 'manage') ?>"/>';
