@@ -29,4 +29,11 @@ class manage_model_user extends core_model_user
         return $event_collection->count();
     }
 
+    public function getWoParentCollection(){
+        $collection = $this->getCollection();
+        $sql = $collection->getSql();
+        $sql .= ' AND user.parent_id IS NULL';
+        $collection->setSql($sql);
+        return $collection;
+    }
 }
