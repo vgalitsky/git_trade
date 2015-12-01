@@ -31,6 +31,7 @@ class manage_model_user extends core_model_user
 
     public function getWoParentCollection(){
         $collection = $this->getCollection();
+        $collection->addRoleFilter(manage_model_role::ROLE_AGENT);
         $sql = $collection->getSql();
         $sql .= ' AND user.parent_id IS NULL';
         $collection->setSql($sql);
