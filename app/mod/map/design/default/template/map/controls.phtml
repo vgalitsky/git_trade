@@ -31,8 +31,8 @@ $luser = app::getSession()->getLoggedInUser();
             <li><a href="#tab-date">Период</a></li>
             <li><a href="#tab-managers">Фильтры</a></li>
             <li><a href="#tab-activity">Активности</a></li>
-            <li><a href="#tab-city">ГЕО</a></li>
-            <li><a href="#tab-traders">Агенты (времмено)</a></li>
+            <!--li><a href="#tab-city">ГЕО</a></li-->
+            <!--li><a href="#tab-traders">Агенты (времмено)</a></li-->
 
             <li>
                 <a href="#tab-settings" title="Настройки">
@@ -80,7 +80,7 @@ $luser = app::getSession()->getLoggedInUser();
                     </table>
                 </div>
             </div>
-            <div id="tab-city">
+            <!--div id="tab-city">
                 <a href="javascript:void(0);" class="check-all-filters"
                    selector="input.marker-field-filter[field=city_id]">Отметить все</a>
                 &nbsp;|&nbsp;
@@ -108,8 +108,8 @@ $luser = app::getSession()->getLoggedInUser();
                         <?php endforeach ?>
                     </table>
                 </div>
-            </div>
-            <div id="tab-traders">
+            </div-->
+            <!--div id="tab-traders">
                 <a href="javascript:void(0);" class="check-all-filters"
                    selector="input.marker-field-filter[field=user_id]">Отметить все</a>
                 &nbsp;|&nbsp;
@@ -161,7 +161,7 @@ $luser = app::getSession()->getLoggedInUser();
                         <?php endforeach ?>
                     </table>
                 </div>
-            </div>
+            </div-->
             <div id="tab-managers">
                 <!--a href="javascript:void(0);" class="check-all-filters"
                    selector="input.marker-field-filter[field=user_id]">Отметить все</a>
@@ -389,7 +389,7 @@ $luser = app::getSession()->getLoggedInUser();
 
 
 </div>
-<div id="version">
+<!--div id="version">
     Версия обновлена.
     <br/>
     <br/>
@@ -410,7 +410,7 @@ $luser = app::getSession()->getLoggedInUser();
     xx: Менеджеры времмено имеют доступ ко всем фильтрам. (к обсуждению - нужен ли вообще такой вид доступа)
 
     <!--a target="_blank" href="<?php echo $this->getUrl('manage/feedback/report') ?>">С ошибками/предложениями сюда</a-->
-</div>
+</div-->
 
 <style>
     #manage-toolbar {
@@ -448,17 +448,17 @@ $luser = app::getSession()->getLoggedInUser();
 </div>
 <script>
     $(function () {
-        $('#version').dialog({
-            width:400,
-            buttons:[{
-
-                text: 'Закрыть',
-                click: function () {
-                    $(this).dialog('close');
-                }
-            }
-            ]
-        });
+//        $('#version').dialog({
+//            width:400,
+//            buttons:[{
+//
+//                text: 'Закрыть',
+//                click: function () {
+//                    $(this).dialog('close');
+//                }
+//            }
+//            ]
+//        });
         $('#controls').show();//.draggable();
 
         progressBar = '<img src="<?php echo self::getSkinUrl("images/progress-bar.gif", 'manage') ?>"/>';
