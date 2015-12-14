@@ -4,6 +4,9 @@
 <div id="working" style="padding:50px; background-color: #fff;z-index:99;">
     Ждите
 </div>
+<div id="loading_overlay">
+    Загрузка...
+</div>
 <div id="version">
     Новая ерсия, возможна нестабильная работа
 </div>
@@ -135,7 +138,7 @@
                 infowindow.close();
             });
             gisTrade.activityMarkers.push(marker);
-            gisTrade.filterMarkers();
+            //gisTrade.filterMarkers();
         },
         showActivityMarkers: function (show) {
             for (var i = 0; i < gisTrade.activityMarkers.length; i++) {
@@ -170,6 +173,14 @@
 
         },
         getAllEvents: function () {
+            $('#loading_overlay').dialog({
+                modal:true,
+                closeOnEscape: false,
+                dialogClass: 'noTitleStuff',
+                width:'200',
+                height:'50',
+                open: function(event, ui) { $(".ui-dialog-titlebar-close", ui.dialog | ui).hide(); }
+            });
             $.ajax({
                 url: '<?php echo $this->getUrl('manage/event/getAllEventsJson') ?>',
                 type: 'POST',
@@ -197,6 +208,7 @@
                          gisTrade.updateMarkerCluster();
                     }
                    gisTrade.zoomMapToVisible();
+                    $('#loading_overlay').dialog('close');
                 }
             })
         },
@@ -248,13 +260,17 @@
 
         },
         ___working: function(){
-            $('#working').dialog({
-                modal: true,
-                width: 400
+            $('#loading_overlay').dialog({
+                modal:true,
+                closeOnEscape: false,
+                dialogClass: 'noTitleStuff',
+                width:'200',
+                height:'50',
+                open: function(event, ui) { $(".ui-dialog-titlebar-close", ui.dialog | ui).hide(); }
             });
         },
         ___workend: function(){
-            $('#working').dialog('close');
+            $('#loading_overlay').dialog('close');
         }
     };
 

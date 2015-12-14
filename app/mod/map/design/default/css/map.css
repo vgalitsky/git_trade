@@ -27,3 +27,4 @@ label[for]{
 .hidden{
     display:none;
 }
+.noTitleStuff .ui-dialog-titlebar {display:none}

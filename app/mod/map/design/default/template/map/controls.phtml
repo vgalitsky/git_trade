@@ -540,7 +540,8 @@ $luser = app::getSession()->getLoggedInUser();
         });
 
         $('.depend-children').click(function(){
-            $($(this).attr('depend')).click();
+            $($(this).attr('depend')).prop('checked', $(this).prop('checked') );
+            gisTrade.filterMarkers();
         });
 
     });
