@@ -431,15 +431,12 @@ $luser = app::getSession()->getLoggedInUser();
     }
 </style>
 <div id="manage-toolbar">
-    <?php if ($luser->getData('role_id') == manage_model_role::ROLE_ADMIN) : ?>
-        <a id="manage" href="javascript:void(0);">Администрирование</a>
-    <?php endif; ?>
+    <?php //if ($luser->getData('role_id') == manage_model_role::ROLE_ADMIN) : ?>
+        <a target="_blank" href="<?php echo $this->getUrl('manage/index/index') ?>" _id="manage" >Администрирование</a>
+    <?php //endif; ?>
     &nbsp;|&nbsp;
     <a href="<?php echo $this->getUrl('map/index/logout') ?>">Выход</a>
-    <?php if ($luser->getData('role_id') == manage_model_role::ROLE_ADMIN) : ?>
-        <br/>
-        <a id="manage" target="_blank" href="<?php echo $this->getUrl('manage/index/index') ?>">> в новом окне</a>
-    <?php endif; ?>
+
 </div>
 <div id="manage-dialog">
     <div id="manage-dialog-content">
