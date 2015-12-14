@@ -20,7 +20,7 @@ class manage_model_event extends core_model{
 
     public function emailGrab(){
         self::$grabtime = time();
-        $inbox = imap_open('{imap.gmail.com:993/imap/ssl}INBOX', 'f.estelkontrol@gmail.com', 'smxksmxk');
+        $inbox = imap_open('{imap.gmail.com:993/imap/ssl}INBOX', 'f.estelkontrol@gmail.com', 'f.estelkontrol08');
 
         /* get all new emails. If set to 'ALL' instead
         * of 'NEW' retrieves all the emails, but can be
