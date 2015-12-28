@@ -46,5 +46,30 @@ class service_controller_api extends core_controller{
 
     }
 
+    public function saveEventsAction(){
+        $events = $this->getRequest()->getParam('events',null);
+        core_debug::dump($events);
+    }
+
+    public function saveEventsExampleAction(){
+        $event = new manage_model_event();
+        $events = $event->getCollection();
+        $i=0;
+        $evnts = array();
+        foreach($events as $event){
+            $i++;
+            if($i>10) break;
+            $event->setData(array(
+                'lat' => $event->getData('lat'),
+                'long' => $event->getData('long'),
+                'imei' => $event->getData('imei'),
+                'date' => $event->getData('date'),
+                'img' => 'image content here',
+            ));
+            $evnts[]=$event->getData();
+        }
+        core_debug::dump($evnts);
+    }
+
 
 }
