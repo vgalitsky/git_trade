@@ -72,17 +72,25 @@ class service_controller_api extends core_controller{
             $event->setData($eventData);
             $event->save();
             core_log::log($event->getData(),'events.added.'.date('d-m-Y').'.log');
-            die('1');
+            $this->_xhrOk();
         }catch(Exception $e){
             core_log::logException($e);
             $request = $_REQUEST;
             unset($request['img']);
             core_log::log($request,'events.request.log');
-            die('err: see exception log');
+            $this->_xhrErr('err: see exception log');
         }
 
 
     }
+
+    protected function _xhrOk(){
+        die('{{:ok:}}');
+    }
+    protected function _xhrErr( $err ){
+        die($err);
+    }
+
 
     protected function _applyDate( $time ){
         if(strlen($time) > 10){
