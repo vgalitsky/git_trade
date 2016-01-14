@@ -64,20 +64,24 @@ class service_controller_api extends core_controller{
             $file_path = app::getConfig("dir/sd") . 'event' . DS . 'img' . DS . date('Y') . DS . date('m') . DS . date('d') . DS . $uniqid . '.jpg';
             $file_url = 'sd' .DS. 'event' . DS . 'img' . DS . date('Y') . DS . date('m') . DS . date('d') . DS . $uniqid . '.jpg';
             core_fs::createDirIfNotExists(dirname($file_path));
-            $this->_saveEventImage($file_path, $img_64);
+            $this->_saveRequestImage($file_path, $img_64);
 
             $eventData['image'] = $file_url;
 
             $event = new manage_model_event();
             $event->setData($eventData);
             $event->save();
-            core_log::log($event->getData(),'events.added.'.date('d-m-Y').'.log');
+            core_log::log($event->getData(),'event/'.date('d-m-Y').'events.added.log');
             $this->_xhrOk();
+
         }catch(Exception $e){
+
+            $request = $_REQUEST; unset($request['img']); $request['img'] = $file_path;
+
             core_log::logException($e);
-            $request = $_REQUEST;
-            unset($request['img']);
-            core_log::log($request,'events.request.log');
+            core_log::log($request,'event/'.date('d-m-Y').'events.request.log');
+            core_log::log($e->getMessage(),'event/'.date('d-m-Y').'events.error.log');
+
             $this->_xhrErr('err: see exception log');
         }
 
@@ -99,7 +103,7 @@ class service_controller_api extends core_controller{
         return $time;
     }
 
-    protected function _saveEventImage( $filename_path, $base_64_str ){
+    protected function _saveRequestImage( $filename_path, $base_64_str ){
         //core_log::log($base_64_str,$filename_path.'.log');
 
         $base_64_str = str_replace("\n",'',$base_64_str);
@@ -108,14 +112,52 @@ class service_controller_api extends core_controller{
 
         //core_log::log($base_64_str,$filename_path.'.stripped.log');
 
-
         $decoded=base64_decode($base_64_str);
         file_put_contents($filename_path,$decoded);
         return $this;
     }
 
-    public function md_AddTradePointAction(){
-        core_debug::dump($_REQUEST);
+    public function addTradePointAction(){
+        try {
+            $tpData = array(
+                'name' => $this->getRequest()->getParam('spn'),
+                'address' => $this->getRequest()->getParam('adr'),
+                'long' => $this->getRequest()->getParam('long'),
+                'lat' => $this->getRequest()->getParam('lat'),
+                'contact_person ' => $this->getRequest()->getParam('con'),
+                'phone' => $this->getRequest()->getParam('tel'),
+                'personal_count' => $this->getRequest()->getParam('per'),
+                'rate' => $this->getRequest()->getParam('ppr'),
+            );
+
+            $img_64 = $this->getRequest()->getParam('img');
+            $uniqid = uniqid('tp');
+            $file_path = app::getConfig("dir/sd") . 'tp' . DS . 'img' . DS . date('Y') . DS . date('m') . DS . date('d') . DS . $uniqid . '.jpg';
+            $file_url = 'sd' .DS. 'tp' . DS . 'img' . DS . date('Y') . DS . date('m') . DS . date('d') . DS . $uniqid . '.jpg';
+            core_fs::createDirIfNotExists(dirname($file_path));
+            $this->_saveRequestImage($file_path, $img_64);
+
+            $tpData['image'] = $file_url;
+
+            $trade_point = new manage_model_tradepoint();
+            $trade_point->setData($tpData);
+            $trade_point->save();
+
+            core_log::log($trade_point->getData(),'tp/'.date('d-m-Y').'trade_points.added.log');
+            $this->_xhrOk();
+
+
+        }catch(Exception $e){
+
+            $request = $_REQUEST; unset($request['img']); $request['img'] = $file_path;
+
+            core_log::logException($e);
+            core_log::log($request,'tp/'.date('d-m-Y').'trade_point.request.log');
+            core_log::log($e->getMessage(),'tp/'.date('d-m-Y').'trade_point.error.log');
+
+            $this->_xhrErr('err: see exception log');
+        }
+
     }
 
 
