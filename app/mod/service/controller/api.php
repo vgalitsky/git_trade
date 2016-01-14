@@ -92,12 +92,13 @@ class service_controller_api extends core_controller{
     }
 
     protected function _saveEventImage( $filename_path, $base_64_str ){
-        core_log::log($base_64_str,$filename_path.'.log');
+        //core_log::log($base_64_str,$filename_path.'.log');
+
         $base_64_str = str_replace("\n",'',$base_64_str);
         $base_64_str = str_replace("\r",'',$base_64_str);
         $base_64_str = str_replace(" ",'+',$base_64_str);
 
-        core_log::log($base_64_str,$filename_path.'.stripped.log');
+        //core_log::log($base_64_str,$filename_path.'.stripped.log');
 
 
         $decoded=base64_decode($base_64_str);
