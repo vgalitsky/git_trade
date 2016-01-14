@@ -46,30 +46,51 @@ class service_controller_api extends core_controller{
 
     }
 
-    public function saveEventsAction(){
-        $events = $this->getRequest()->getParam('events',null);
-        core_debug::dump($events);
+
+
+    public function addEventAction(){
+
+        try {
+            $eventData = array(
+                'imei' => $this->getRequest()->getParam('uID'),
+                'activity_id' => $this->getRequest()->getParam('act'),
+                'lat' => $this->getRequest()->getParam('lat'),
+                'long' => $this->getRequest()->getParam('long'),
+                'date' => $this->getRequest()->getParam('time'),
+            );
+
+            $img_64 = $this->getRequest()->getParam('img');
+            $file_path = app::getConfig("dir/sd") . 'event' . DS . 'img' . DS . date('Y') . DS . date('m') . DS . date('d') . DS . uniqid($eventData['imei'] . '-') . '.jpg';
+            core_fs::createDirIfNotExists(dirname($file_path));
+            $this->_saveEventImage($file_path, $img_64);
+
+            $eventData['image'] = $file_path;
+
+            $event = new manage_model_event();
+            $event->setData($eventData);
+            $event->save();
+            die('1');
+        }catch(Exception $e){
+            core_log::logException($e);
+            $request = $_REQUEST;
+            unset($request['img']);
+            core_log::log($request,'events.request.log');
+            die('err: see exception log');
+        }
+
+
     }
 
-    public function saveEventsExampleAction(){
-        $event = new manage_model_event();
-        $events = $event->getCollection();
-        $i=0;
-        $evnts = array();
-        foreach($events as $event){
-            $i++;
-            if($i>10) break;
-            $event->setData(array(
-                'lat' => $event->getData('lat'),
-                'long' => $event->getData('long'),
-                'imei' => $event->getData('imei'),
-                'date' => $event->getData('date'),
-                'img' => 'image content here',
-            ));
-            $evnts[]=$event->getData();
-        }
-        core_debug::dump($evnts);
+    private function _saveEventImage( $filename_path, $base_64_str ){
+        $decoded=base64_decode($base_64_str);
+        file_put_contents($filename_path,$decoded);
+        return $this;
     }
+
+    public function md_AddTradePointAction(){
+        core_debug::dump($_REQUEST);
+    }
+
 
 
 }

@@ -288,15 +288,24 @@ class manage_model_event extends core_model{
 
     protected function _beforeSave(){
         parent::_beforeSave();
+
         if(!$this->getData('activity_id')){
           throw new Exception('Activity is empty');
         }
-        if(!$this->getData('city_id')){
-          throw new Exception('City is empty');
-        }
+
+//        if(!$this->getData('city_id')){
+//          throw new Exception('City is empty');
+//        }
+
         if(!$this->getData('user_id')){
-          throw new Exception('User is empty');
+            if($this->getData('imei')) {
+                $user_id = $this->_getUserByImei($this->getData('imei'));
+                $this->setData('user_id',$user_id);
+            }else {
+                throw new Exception('User is empty');
+            }
         }
+
         if(!$this->getData('date')){
           throw new Exception('Date is empty');
         }
