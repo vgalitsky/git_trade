@@ -71,7 +71,7 @@ class service_controller_api extends core_controller{
             $event = new manage_model_event();
             $event->setData($eventData);
             $event->save();
-            core_log::log($event->getData(),'events.added.log');
+            core_log::log($event->getData(),'events.added.'.date('d-m-Y').'.log');
             die('1');
         }catch(Exception $e){
             core_log::logException($e);
@@ -92,6 +92,7 @@ class service_controller_api extends core_controller{
     }
 
     protected function _saveEventImage( $filename_path, $base_64_str ){
+        core_log::log($base_64_str,$filename_path.'log');
         $decoded=base64_decode($base_64_str);
         file_put_contents($filename_path,$decoded);
         return $this;
