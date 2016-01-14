@@ -60,8 +60,9 @@ class service_controller_api extends core_controller{
             );
 
             $img_64 = $this->getRequest()->getParam('img');
-            $file_path = app::getConfig("dir/sd") . 'event' . DS . 'img' . DS . date('Y') . DS . date('m') . DS . date('d') . DS . uniqid($eventData['imei'] . '-') . '.jpg';
-            $file_url = 'sd' .DS. 'event' . DS . 'img' . DS . date('Y') . DS . date('m') . DS . date('d') . DS . uniqid($eventData['imei'] . '-') . '.jpg';
+            $uniqid = uniqid($eventData['imei'] . '-');
+            $file_path = app::getConfig("dir/sd") . 'event' . DS . 'img' . DS . date('Y') . DS . date('m') . DS . date('d') . DS . $uniqid . '.jpg';
+            $file_url = 'sd' .DS. 'event' . DS . 'img' . DS . date('Y') . DS . date('m') . DS . date('d') . DS . $uniqid . '.jpg';
             core_fs::createDirIfNotExists(dirname($file_path));
             $this->_saveEventImage($file_path, $img_64);
 
