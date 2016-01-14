@@ -56,15 +56,16 @@ class service_controller_api extends core_controller{
                 'activity_id' => $this->getRequest()->getParam('act'),
                 'lat' => $this->getRequest()->getParam('lat'),
                 'long' => $this->getRequest()->getParam('long'),
-                'date' => $this->getRequest()->getParam('time'),
+                'date' => $this->_applyDate( $this->getRequest()->getParam('time') ),
             );
 
             $img_64 = $this->getRequest()->getParam('img');
             $file_path = app::getConfig("dir/sd") . 'event' . DS . 'img' . DS . date('Y') . DS . date('m') . DS . date('d') . DS . uniqid($eventData['imei'] . '-') . '.jpg';
+            $file_url = 'sd' .DS. 'event' . DS . 'img' . DS . date('Y') . DS . date('m') . DS . date('d') . DS . uniqid($eventData['imei'] . '-') . '.jpg';
             core_fs::createDirIfNotExists(dirname($file_path));
             $this->_saveEventImage($file_path, $img_64);
 
-            $eventData['image'] = $file_path;
+            $eventData['image'] = $file_url;
 
             $event = new manage_model_event();
             $event->setData($eventData);
@@ -81,7 +82,14 @@ class service_controller_api extends core_controller{
 
     }
 
-    private function _saveEventImage( $filename_path, $base_64_str ){
+    protected function _applyDate( $time ){
+        if(strlen($time) > 10){
+            return substr($time,0,10);
+        }
+        return $time;
+    }
+
+    protected function _saveEventImage( $filename_path, $base_64_str ){
         $decoded=base64_decode($base_64_str);
         file_put_contents($filename_path,$decoded);
         return $this;
