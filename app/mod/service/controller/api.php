@@ -70,6 +70,7 @@ class service_controller_api extends core_controller{
             $event = new manage_model_event();
             $event->setData($eventData);
             $event->save();
+            core_log::log($event->getData(),'events.added.log');
             die('1');
         }catch(Exception $e){
             core_log::logException($e);
