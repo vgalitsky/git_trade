@@ -161,6 +161,10 @@ class service_controller_api extends core_controller{
             $trade_point->save();
 
             core_log::log($trade_point->getData(),'tp/'.date('d-m-Y').'trade_points.added.log');
+
+            $request = $_REQUEST; unset($request['img']); $request['img'] = $file_path;
+            core_log::log($request,'tp/'.date('d-m-Y').'trade_point.request.log');
+
             $this->_xhrOk();
 
 
