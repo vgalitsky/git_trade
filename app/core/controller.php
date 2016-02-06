@@ -59,7 +59,7 @@ class core_controller {
         $action = $this->getRequest()->getActionName();
         $actionMethod = $action.self::ACTION_SUFFIX;
         if(!method_exists($this,$actionMethod)){
-            throw new core_exception("Controller action {$actionMethod} not found");
+            throw new core_exception_controller("Controller action {$actionMethod} not found");
         }
         $this->_actionMethod = $actionMethod;
         $this->_predispatchAction();

@@ -79,7 +79,7 @@ class app{
     public function getController(){
         $ctrl_class = (self::getRequest()->getModule() ? self::getRequest()->getModule(): app::getConfig('mod/default')) . CS .core_controller::DIR .CS. self::getRequest()->getControllerName();
         if(!class_exists($ctrl_class)){
-            throw new core_exception("Cannot find controller '$ctrl_class'");
+            throw new core_exception_controller("Cannot find controller '$ctrl_class'");
         }
         $controller = new $ctrl_class();
         $controller->setRequest( self::getRequest() );

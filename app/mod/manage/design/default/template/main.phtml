@@ -9,17 +9,22 @@
     tbody tr:hover{
     background-color:#ccc;
 }
+    .main{
+        margin:50px;
+    }
 </style>
 <div class="main">
     <div id="manage-tabs" class="tabs">
     <ul >
         <li><a href="#manage-tab-traders">Пользователи</a></li>
         <li><a href="#manage-tab-activities">Активности</a></li>
+        <li><a href="#manage-tab-competitors">Конкуренты</a></li>
         <li><a href="#manage-tab-city">Города</a></li>
     </ul>
         <div class="tab-content" id="manage-tab-activities"><img src="<?php echo self::getSkinUrl("images/progress-bar.gif", 'manage') ?>"/></div>
         <div class="tab-content" id="manage-tab-city"><img src="<?php echo self::getSkinUrl("images/progress-bar.gif", 'manage') ?>"/></div>
         <div class="tab-content" id="manage-tab-traders"><img src="<?php echo self::getSkinUrl("images/progress-bar.gif", 'manage') ?>"/></div>
+        <div class="tab-content" id="manage-tab-competitors"><img src="<?php echo self::getSkinUrl("images/progress-bar.gif", 'manage') ?>"/></div>
 </div>
 <div class="clear"></div>
 <script>
@@ -41,6 +46,12 @@
            url: '<?php echo $this->getUrl('manage/user/list')?>',
            complete: function(response){
                $('#manage-tab-traders').html(response.responseText);
+           }
+        });
+        $.ajax({
+           url: '<?php echo $this->getUrl('manage/competitor/list')?>',
+           complete: function(response){
+               $('#manage-tab-competitors').html(response.responseText);
            }
         });
     })(jQuery);

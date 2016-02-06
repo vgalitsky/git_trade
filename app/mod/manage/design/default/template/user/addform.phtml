@@ -15,7 +15,7 @@ $cities = $this->getVar('cities');
             <td>
                 <select name="user[role_id]" <?php if($user->getId()) echo 'disabled'?>>
                     <option value="<?php echo manage_model_role::ROLE_AGENT ?>">Агент</option>
-                    <option value="<?php echo manage_model_role::ROLE_MANAGER ?>">Менеджер</option>
+                    <option value="<?php echo manage_model_role::ROLE_MANAGER ?>">Супервайзер</option>
                     <option value="<?php echo manage_model_role::ROLE_ADMIN ?>">Администратор</option>
                 </select>
             </td>
@@ -37,7 +37,7 @@ $cities = $this->getVar('cities');
             <td><input type="text" name="user[fullname]" value="<?php echo $user->getData('fullname')?>"/></td>
         </tr>
         <tr id="user-form-parent-id" class="<?php if($user->getId() && $user->getData('role_id')!=manage_model_role::ROLE_AGENT) echo 'hidden' ?>">
-            <td>Менеджер</td>
+            <td>Супервайзер</td>
             <td>
                 <select name="user[parent_id]" value="<?php $user->getData('parent_id') ?>">
                     <?php foreach($managers as $manager):?>

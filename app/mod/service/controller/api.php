@@ -2,6 +2,9 @@
 class service_controller_api extends core_controller{
 
 
+    /**
+     * 
+     */
     public function getActivitiesAction(){
         $activity_model = new manage_model_activity();
         /** @var manage_model_activity_collection $ac */
@@ -13,6 +16,20 @@ class service_controller_api extends core_controller{
         $activities = $ac->toArray(  );
         foreach($activities as $id=>$activity){
             fputs($ftmp,"{:$id:}{$activity['name']}\n");
+        }
+        fclose($ftmp);
+    }
+    public function getCompetitorsAction(){
+        $competitor_model = new manage_model_competitor();
+        /** @var manage_model_competitor_collection $cc */
+        $cc = $competitor_model->getCollection()
+                ->competitorReferenceForMobile();
+        $cc->load();
+
+        $ftmp = fopen('php://output', 'w');
+        $competitors = $cc->toArray(  );
+        foreach($competitors as $id=>$competitor){
+            fputs($ftmp,"{:$id:}{$competitor['name']}\n");
         }
         fclose($ftmp);
     }

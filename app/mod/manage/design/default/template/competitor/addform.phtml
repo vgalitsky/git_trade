@@ -1,0 +1,8 @@
+<?php
+/** @var manage_model_competitor $competitor */
+$competitor = $this->getVar('competitor');
+?>
+<form id="add-competitor-form" action="<?php $this->getUrl('manage/competitor/save/ajax/1') ?>" method="POST" onsubmit="return false;">
+    <input type="hidden" name="competitor[competitor_id]" value="<?php echo $competitor->getId()?>" />
+    Конкурент: <input type="text" name="competitor[name]" value="<?php echo $competitor->getData('name')?>"/>
+</form>

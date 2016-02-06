@@ -1,0 +1,29 @@
+<?php /** @var manage_block_competitor_grid $this*/?>
+<?php
+$collection = $this->getVar('collection');
+$collection->load();
+?>
+
+<table id="competitor-grid" cellspacing="0" cellpadding="0" width="100%">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Конкурент</th>
+            <!--th>К-во событий</th-->
+            <th></th>
+        </tr>
+    </thead>
+<?php foreach($this->getVar('collection') as $competitor): ?>
+    <tr competitor_id="<?php echo $competitor->getId()?>">
+        <td><?php echo $competitor->getId()?></td>
+        <td><?php echo $competitor->getData('name')?></td>
+        <!--td><?php echo $competitor->getData('events_sum')?></td-->
+        <td>
+            <ul id="icons" class="ui-widget ui-helper-clearfix right">
+                <li onclick="competitorManager.getForm(<?php echo $competitor->getId()?>)" class="ui-state-default ui-corner-all" title="Изменить"><span class="ui-icon ui-icon-pencil"></span></li>
+                <li onclick="competitorManager.deletecompetitor(<?php echo $competitor->getId()?>)" competitor_id="<?php echo $competitor->getId()?>" class="competitor-grid-delete ui-state-default ui-corner-all" title="Удалить"><span class="ui-icon ui-icon-trash"></span></li>
+             </ul>
+        </td>
+    </tr>
+<?php endforeach?>
+</table>

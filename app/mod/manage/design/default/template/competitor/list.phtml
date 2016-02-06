@@ -1,0 +1,144 @@
+<style>
+    #add-dialog-competitor{
+        display:none;
+    }
+    #add-dialog-competitor-content{
+        text-align: center;
+    }
+</style>
+<div id="competitor-grid-container">
+    <button style="font-size:12px" class="button" id="add-competitor" url="<?php echo $this->getUrl('manage/competitor/add_form') ?>">Добавить</button>
+    <hr/>
+    <div id="competitor-grid-container-content">
+        <img src="<?php echo self::getSkinUrl('images/progress-bar.gif') ?>"/>
+    </div>
+</div>
+<div id="add-dialog-competitor">
+    <div id="add-dialog-competitor-content">
+        <img src="<?php echo self::getSkinUrl('images/progress-bar.gif') ?>"/>
+    </div>
+</div>
+
+<script>
+
+    progressBar = '<img src="<?php echo self::getSkinUrl("images/progress-bar.gif") ?>"/>';
+    competitorManager = {
+        updateList: function(){
+            $('#competitor-grid-container-content').html(progressBar);
+            $.ajax({
+               type: 'POST',
+               url: '<?php echo $this->getUrl('manage/competitor/grid') ?>',
+               complete: function(response){
+                   $('#competitor-grid-container-content').html(response.responseText);
+               }
+
+            });
+        },
+        savecompetitor: function(){
+            var data = $('#add-competitor-form').serialize();
+            $('#add-dialog-competitor-content').html(progressBar);
+            $.ajax({
+                type: 'POST',
+                url: '<?php echo $this->getUrl('manage/competitor/save') ?>',
+                data: data,
+                complete: function(response){
+                    $('#add-dialog-competitor-content').html(response.responseText);
+                    $('#add-dialog-competitor').dialog({
+                        modal: true,
+                        width: 400,
+                        buttons: [
+                            {
+                                text: "Закрыть",
+                                click: function() {
+                                    $( this ).dialog( "close" );
+                                    competitorManager.updateList();
+                                }
+                            }
+                        ]
+                    });
+                }
+            });
+        },
+        getForm: function( competitor_id ){
+            $('#add-dialog-competitor-content').html(progressBar);
+            $('#add-dialog-competitor').dialog({
+                modal: true,
+                width: 400,
+                buttons: [
+                    {
+                        text: "Сохранить",
+                        click: function() {
+                            competitorManager.savecompetitor();
+                        }
+                    },
+                    {
+                        text: "Отмена",
+                        click: function() {
+                            $( this ).dialog( "close" );
+                        }
+                    }
+                ]
+            });
+            $.ajax({
+                type: 'POST',
+                url: $('#add-competitor').attr('url'),
+                data:{
+                    competitor_id: competitor_id
+                },
+                complete: function(response){
+                    $('#add-dialog-competitor-content').html(response.responseText);
+                }
+            });
+        },
+
+        deletecompetitor: function(competitor_id){
+            $('#add-dialog-competitor-content').html('Удалить?');
+            $('#add-dialog-competitor').dialog({
+                modal: true,
+                width: 400,
+                buttons: [
+                    {
+                        text: "Удалить",
+                        click: function() {
+                            var dialog=this;
+                            $.ajax({
+                                type: 'POST',
+                                url: '<?php echo $this->getUrl('manage/competitor/delete')?>',
+                                data: {competitor_id: competitor_id},
+                                complete: function(response){
+                                    $('#add-dialog-competitor-content').html(response.responseText);
+                                    $( dialog ).dialog( {
+                                        buttons:[{
+                                            text: "Закрыть",
+                                            click: function() {
+                                                $( this ).dialog( "close" );
+                                                $('tr[competitor_id='+competitor_id+']').animate({opacity:0},'slow',function(){
+                                                    $(this).remove();
+                                                });
+                                            }
+                                        }]
+                                    } );
+                                }
+                            });
+                        }
+                    },
+                    {
+                        text: "Отмена",
+                        click: function() {
+                            $( this ).dialog( "close" );
+                        }
+                    }
+                ]
+            });
+        }
+    };
+
+    (function($){
+
+        competitorManager.updateList();
+        $('#add-competitor').click(function(){
+            competitorManager.getForm();
+        });
+
+    })(jQuery)
+</script>
