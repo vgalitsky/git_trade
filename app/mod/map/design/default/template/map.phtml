@@ -8,7 +8,10 @@
     Загрузка...
 </div>
 <div id="version">
-    Новая ерсия, возможна нестабильная работа
+    Верися обновлена,<br/>
+    Возможна нестабильная работа приложения<br/>
+    0977454582
+
 </div>
 <script>
 
@@ -248,8 +251,17 @@
                 }
             }
             gisTrade.updateMarkerCluster();
-            setTimeout(function(){gisTrade.zoomMapToVisible()},1000);
+           // setTimeout(function(){gisTrade.zoomMapToVisible()},1000);
             gisTrade.___workend();
+        },
+        filterMarkersByUser: function( user_id ){
+
+            $('input.marker-field-filter').prop('checked',false);
+            $('input.depend-children').prop('checked',false);
+            $('input.marker-field-filter#user_'+user_id).prop('checked',true);
+
+            gisTrade.filterMarkers();
+
         },
         deleteEvent: function( event_id){
             $.ajax({

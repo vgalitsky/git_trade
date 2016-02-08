@@ -29,7 +29,7 @@ $luser = app::getSession()->getLoggedInUser();
 
         <ul style="font-size:10px;">
             <li><a href="#tab-date">Период</a></li>
-            <li><a href="#tab-managers">Фильтры</a></li>
+            <li><a href="#tab-managers">Персонал</a></li>
             <li><a href="#tab-activity">Активности</a></li>
             <!--li><a href="#tab-city">ГЕО</a></li-->
             <!--li><a href="#tab-traders">Агенты (времмено)</a></li-->
@@ -435,6 +435,8 @@ $luser = app::getSession()->getLoggedInUser();
         <a target="_blank" href="<?php echo $this->getUrl('manage/index/index') ?>" _id="manage" >Администрирование</a>
     <?php //endif; ?>
     &nbsp;|&nbsp;
+    <a style="color:red" href="javascript:void(0)" id="toolbar-button-report-issue">Сообщить о проблеме</a>
+    &nbsp;|&nbsp;
     <a href="<?php echo $this->getUrl('map/index/logout') ?>">Выход</a>
 
 </div>
@@ -445,17 +447,18 @@ $luser = app::getSession()->getLoggedInUser();
 </div>
 <script>
     $(function () {
-//        $('#version').dialog({
-//            width:400,
-//            buttons:[{
-//
-//                text: 'Закрыть',
-//                click: function () {
-//                    $(this).dialog('close');
-//                }
-//            }
-//            ]
-//        });
+        $('#version').dialog({
+            modal: true,
+            width:400,
+            buttons:[{
+
+                text: 'Закрыть',
+                click: function () {
+                    $(this).dialog('close');
+                }
+            }
+            ]
+        });
         $('#controls').show();//.draggable();
 
         progressBar = '<img src="<?php echo self::getSkinUrl("images/progress-bar.gif", 'manage') ?>"/>';
@@ -543,3 +546,25 @@ $luser = app::getSession()->getLoggedInUser();
 
     });
 </script>
+<!--
+-->
+<div id="flowze-report-isue">
+    <div style="color:red"><?php echo $this->l('In progress') ?></div>
+    0977454582
+</div>
+<script>
+    $('#toolbar-button-report-issue').click(function(){
+        $('#flowze-report-isue').dialog({
+            modal: true,
+            title: '<?php echo $this->l('Сообщить о проблеме') ?>',
+            buttons: [{
+                text: '<?php echo $this->l('Submit') ?>',
+                click: function () {
+                    $(this).dialog('close');
+                }
+            }]
+        });
+    });
+</script>
+<!--
+-->
