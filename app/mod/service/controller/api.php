@@ -153,6 +153,7 @@ class service_controller_api extends core_controller{
                 'is_light_box' => $this->getRequest()->getParam('ilb'),
                 'is_panel' => $this->getRequest()->getParam('ipl'),
                 'shelf' => $this->getRequest()->getParam('slf'),
+                'competitor_id' => $this->getRequest()->getParam('competitor_id'),
             );
 
             $img_64 = $this->getRequest()->getParam('img');
