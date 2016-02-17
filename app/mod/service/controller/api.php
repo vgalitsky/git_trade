@@ -145,6 +145,14 @@ class service_controller_api extends core_controller{
                 'phone' => $this->getRequest()->getParam('tel'),
                 'personal_count' => $this->getRequest()->getParam('per'),
                 'rate' => $this->getRequest()->getParam('ppr'),
+
+                'web' => $this->getRequest()->getParam('web'),
+                'email' => $this->getRequest()->getParam('eml'),
+                'info' => $this->getRequest()->getParam('inf'),
+
+                'is_light_box' => $this->getRequest()->getParam('ilb'),
+                'is_panel' => $this->getRequest()->getParam('ipl'),
+                'shelf' => $this->getRequest()->getParam('slf'),
             );
 
             $img_64 = $this->getRequest()->getParam('img');

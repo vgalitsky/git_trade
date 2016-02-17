@@ -79,6 +79,7 @@
 
     gisTrade = {
         map: null,
+        tradepointMarkers: [],
         activityMarkers: [],
         activityMarkersCluster: null,
         currentPos: 0,
@@ -88,6 +89,7 @@
             gisTrade.activityMarkersCluster = null;
 
             gisTrade.getAllEvents();
+            gisTrade.getTradePoints();
 
 
            /* google.maps.event.addListener(gisTrade.activityMarkersCluster, "mouseover", function (mCluster) {
@@ -101,6 +103,77 @@
             //gisTrade.showActivityMarkers(true);
             //gisTrade.filterMarkers();
             //setTimeout(function(){gisTrade.filterMarkers()},100);
+        },
+        getTradePoints: function(){
+            $('#loading_overlay').dialog({
+                modal:true,
+                closeOnEscape: false,
+                dialogClass: 'noTitleStuff',
+                width:'200',
+                height:'50',
+                open: function(event, ui) { $(".ui-dialog-titlebar-close", ui.dialog | ui).hide(); }
+            });
+            $.ajax({
+                url: '<?php echo $this->getUrl('manage/tradepoint/getAllTradePointsJson') ?>',
+                type: 'POST',
+                dataType: 'JSON',
+                data: $('#controls-form').serialize(),
+                complete: function (response) {
+                    console.log(response);
+                    if (!response.responseJSON) {
+                        alert('Error while retrieving trade points data');
+                        return false;
+                    } else {
+                        for (var event_id in response.responseJSON.data) {
+                            var data = response.responseJSON.data[event_id];
+                            var markerData = {
+                                LatLng: new google.maps.LatLng(data.lat, data.long),
+                                content: data.content,
+                                title: data.title,
+                                img: data.img,
+                                marker_color: data.marker_color,
+                                origData: data
+                            };
+                            gisTrade.addTradePointMarker(markerData);
+
+                        }
+
+                    }
+                    $('#loading_overlay').dialog('close');
+                }
+            })
+        },
+        addTradePointMarker: function( markerData ){
+            var pinColor = markerData.marker_color ? markerData.marker_color : 'FE7569';
+            var pinImage = new google.maps.MarkerImage('<?php echo $this->getSkinUrl('img/marker/perfumery.png') ?>',
+                new google.maps.Size(34, 36),
+                new google.maps.Point(0,0),
+                new google.maps.Point(10, 34));
+
+            var marker = new google.maps.Marker({
+                position: markerData.LatLng,
+                map: gisTrade.map,
+                title: markerData.title,
+                icon: pinImage,
+                //label:markerData.title[0],
+
+                //animation: google.maps.Animation.DROP,
+                ___data: markerData
+
+            });
+            var infowindow = new google.maps.InfoWindow({
+                content: markerData.content,
+                maxWidth: 400
+            });
+
+            google.maps.event.addListener(marker, 'click', function () {
+                infowindow.open(gisTrade.map, marker);
+                marker.iw=infowindow
+            });
+            google.maps.event.addListener(gisTrade.map, 'click', function () {
+                infowindow.close();
+            });
+            gisTrade.tradepointMarkers.push(marker);
         },
         addActivityMarker: function (markerData) {
             var pinColor = markerData.marker_color ? markerData.marker_color : 'FE7569';
@@ -213,7 +286,7 @@
                    gisTrade.zoomMapToVisible();
                     $('#loading_overlay').dialog('close');
                 }
-            })
+            });
         },
         zoomMapToVisible: function(){
             var markers = gisTrade.activityMarkers;

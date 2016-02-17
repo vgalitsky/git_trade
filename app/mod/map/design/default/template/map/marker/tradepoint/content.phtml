@@ -1,0 +1,84 @@
+<?php
+/** @var map_block_map_tradepoint_content $this */
+/** @var manage_model_tradepoint $tradepoint */
+$tradepoint = $this->getVar('tradepoint');
+?>
+<style>
+    .tab{
+        height:206px;
+        width:368px;
+    }
+</style>
+<div class="marker-content">
+    <h1><?php echo $tradepoint->getData('title') ?></h1>
+
+    <div id="marker-tabs" class="tabs">
+
+        <ul style="font-size:10px;">
+            <li><a href="#tab-image">Изображение</a></li>
+            <li><a href="#tab-data">Данные</a></li>
+            <li><a href="#tab-tool">Управление</a></li>
+        </ul>
+        <div id="tab-image" class="tab">
+           <a target="_blank" href="<?php echo $this->getUrl($tradepoint->getData('image')); ?>"> <img width="360px" src="<?php echo $this->getUrl($tradepoint->getData('image')); ?>"/></a>
+        </div>
+        <div id="tab-data" class="marker-data tab" >
+            <table class="info-table" width="370px" height="206">
+                <tr>
+                    <td>Название</td>
+                    <td><?php echo$tradepoint->getData('name') ?></td>
+                </tr>
+                <tr>
+                    <td>Адрес</td>
+                    <td><?php echo $tradepoint->getData('address') ?></td>
+                </tr>
+                <tr>
+                    <td>Контакт</td>
+                    <td><?php echo $tradepoint->getData('contact_person') ?></td>
+                </tr>
+                <tr>
+                    <td>Телефон</td>
+                    <td><?php echo $tradepoint->getData('phone') ?></td>
+                </tr>
+                <tr>
+                    <td>К-во персонала</td>
+                    <td><?php echo $tradepoint->getData('personal_count') ?></td>
+                </tr>
+                <tr>
+                    <td>Рейт</td>
+                    <td><?php echo $tradepoint->getData('rate') ?></td>
+                </tr>
+                <tr>
+                    <td>Сайт</td>
+                    <td><?php echo $tradepoint->getData('web') ?></td>
+                </tr>
+                <tr>
+                    <td>Email</td>
+                    <td><?php echo $tradepoint->getData('email') ?></td>
+                </tr>
+                <tr>
+                    <td>Доп. информация</td>
+                    <td><?php echo $tradepoint->getData('info') ?></td>
+                </tr>
+                <tr>
+                    <td>Лайтбокс</td>
+                    <td><?php echo ($tradepoint->getData('is_light_box') ? 'Есть' : 'Нет') ?></td>
+                </tr>
+
+                <tr>
+                    <td>Панель</td>
+                    <td><?php echo ($tradepoint->getData('is_panel') ? 'Есть' : 'Нет') ?></td>
+                </tr>
+                <tr>
+                    <td>Витрина</td>
+                    <td><?php echo ($tradepoint->getData('shelf') ? 'Есть' : 'Нет') ?></td>
+                </tr>
+            </table>
+        </div>
+        <div id="tab-tool" class="tab" >
+            <button class="button-tradepoint-delete" tradepoint_id="<?php echo $tradepoint->getId() ?>" onclick="gisTrade.deleteTradepoint('<?php echo $tradepoint->getId() ?>')">Удалить</button>
+        </div>
+
+    </div>
+
+</div>
