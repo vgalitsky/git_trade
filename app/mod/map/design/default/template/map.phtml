@@ -82,6 +82,7 @@
         tradepointMarkers: [],
         activityMarkers: [],
         activityMarkersCluster: null,
+        tradePointMarkersCluster: null,
         currentPos: 0,
         init: function () {
             gisTrade.showActivityMarkers(false);
@@ -141,7 +142,8 @@
                     }
                     $('#loading_overlay').dialog('close');
                 }
-            })
+            });
+            gisTrade.updateTradePOintMarkerCluster();
         },
         addTradePointMarker: function( markerData ){
             var pinColor = markerData.marker_color ? markerData.marker_color : 'FE7569';
@@ -246,6 +248,15 @@
 
             //gisTrade.activityMarkersCluster = new MarkerClusterer(gisTrade.map, gisTrade.activityMarkers, {/*zoomOnClick:false*/});
             //gisTrade.activityMarkersCluster.repaint();
+
+        },
+        updateTradePOintMarkerCluster: function(){
+//            if(gisTrade.activityMarkersCluster ){
+//                gisTrade.activityMarkersCluster.setMap(null);
+//            }
+
+            gisTrade.tradepointMarkersCluster = new MarkerClusterer(gisTrade.map, gisTrade.tradepointMarkers, {/*zoomOnClick:false*/});
+            gisTrade.tradepointMarkersCluster.repaint();
 
         },
         getAllEvents: function () {
