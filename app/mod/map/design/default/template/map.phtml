@@ -140,10 +140,11 @@
                         }
 
                     }
-                    $('#loading_overlay').dialog('close');
+                    $('#loading_overlay').dialog('close')
+                    gisTrade.updateTradePointMarkerCluster();
                 }
             });
-            gisTrade.updateTradePOintMarkerCluster();
+
         },
         addTradePointMarker: function( markerData ){
             var pinColor = markerData.marker_color ? markerData.marker_color : 'FE7569';
@@ -250,7 +251,7 @@
             //gisTrade.activityMarkersCluster.repaint();
 
         },
-        updateTradePOintMarkerCluster: function(){
+        updateTradePointMarkerCluster: function(){
 //            if(gisTrade.activityMarkersCluster ){
 //                gisTrade.activityMarkersCluster.setMap(null);
 //            }
